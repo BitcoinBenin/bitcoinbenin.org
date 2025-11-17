@@ -31,7 +31,7 @@ export default function Hero() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 mt-4 justify-center animate-fade-in-up delay-200 w-full">
             <a
-              href="#"
+              href="https://x.com/bitcoinbenin"
               className="btn-primary-orange text-white font-bold py-4 px-8 rounded-lg text-lg hover:shadow-orange-glow transition-all duration-300 transform hover:scale-105 animate-pulse-green mx-2"
             >
               Rejoindre la communauté
