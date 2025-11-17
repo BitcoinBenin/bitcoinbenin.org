@@ -26,7 +26,7 @@ export default function AcceptBitcoinPage() {
           La communauté Bitcoin Bénin vous accompagne gratuitement dans la mise en place de solutions de paiement Bitcoin pour votre commerce. Contactez-nous pour une consultation personnalisée.
           </p>
           <a
-            href=" bitcoinbenin@gmail.com" // Placeholder for contact link
+            href="mailto:bitcoinbenin@gmail.com" // Placeholder for contact link
             className="btn-primary-orange text-white font-bold py-3 px-6 rounded-lg text-base"
           >
             Contactez-nous
