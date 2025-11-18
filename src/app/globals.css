@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+:root {
+  --bitcoin-orange: #F7931A; /* Orange Bitcoin */
+}
+
+@layer components {
+  .bg-hero-gradient-dark {
+    background: linear-gradient(120deg, #0D1117 0%, #064E3B 100%);
+  }
+
+  .btn-primary-orange {
+    background-color: #F7931A; /* orange-bitcoin */
+    transition: all 0.3s ease;
+  }
+  .btn-primary-orange:hover {
+    box-shadow: 0 0 25px rgba(247, 147, 26, 0.6);
+  }
+
+  .btn-secondary-outline {
+    background-color: transparent;
+    border: 2px solid white;
+    transition: all 0.3s ease;
+  }
+  .btn-secondary-outline:hover {
+    background: linear-gradient(90deg, #16A34A 0%, #00BF63 100%);
+    border-color: transparent;
+  }
+
+  .text-glow-green {
+    text-shadow: 0 0 15px rgba(0, 194, 103, 0.4);
+  }
+
+  .btn-primary-green {
+    background-color: #00C267;
+    transition: all 0.3s ease;
+  }
+  .btn-primary-green:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 194, 103, 0.5);
+  }
+
+  .btn-secondary-green-outline {
+    background-color: transparent;
+    border: 2px solid #00C267;
+    color: #00C267;
+    transition: all 0.3s ease;
+  }
+  .btn-secondary-green-outline:hover {
+    background-color: #00C267;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 194, 103, 0.5);
+  }
+
+  .bg-bitcoin-gradient {
+    background: linear-gradient(90deg, #00BF63 0%, #001E3C 100%);
+  }
+
+  .text-highlight {
+    text-shadow: 0 0 15px rgba(0, 255, 100, 0.8);
+  }
+
+  .btn-glass {
+    background: rgba(0, 255, 100, 0.1);
+    border: 1px solid rgba(0, 255, 100, 0.3);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+
+  .btn-glass:hover {
+    background: rgba(0, 255, 100, 0.2);
+    border-color: rgba(0, 255, 100, 0.5);
+    box-shadow: 0 0 20px rgba(0, 255, 100, 0.5);
+    transform: translateY(-2px);
+  }
+
+  .image-blend {
+    mask-image: radial-gradient(circle, black 60%, transparent 100%);
+    filter: drop-shadow(0 0 30px rgba(0, 255, 100, 0.4));
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .btn-mission {
+    background-color: #009B5A;
+    box-shadow: 0 4px 10px rgba(0,155,90,0.2);
+    transition: all 0.3s ease;
+  }
+
+  .btn-mission:hover {
+    background-image: linear-gradient(90deg, #009B5A, #007548);
+  }
+
+  /* Animation pour la modale de la galerie */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
