@@ -2,6 +2,7 @@ import Hero from "./components/Hero";
 import Mission from "./components/Mission";
 import JoinUs from "./components/JoinUs";
 import Testimonials from "./components/Testimonials";
+import GalleryPreview from "./components/GalleryPreview";
 import Partners from "./components/Partners";
 import type { Metadata } from 'next';
 
@@ -16,6 +17,7 @@ export default function Home() {
       <Hero />
       <Mission />
       <JoinUs />
+      <GalleryPreview />
       <Testimonials />
       <Partners />
     </>

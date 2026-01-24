@@ -36,84 +36,90 @@ export default function TeamSection() {
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
+    hidden: { opacity: 0, scale: 0.9 },
     show: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: easeOut } },
   };
 
   return (
-    <motion.section 
-      className="relative bg-hero-gradient-dark text-white py-20 px-4 sm:px-6 flex flex-col items-center"
+    <motion.section
+      className="relative py-24 px-4 sm:px-6 flex flex-col items-center overflow-hidden"
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, amount: 0.1 }}
       variants={sectionVariants}
     >
-      
+
       {/* ✅ Titre Section */}
-      <motion.div 
-        className="max-w-7xl mx-auto w-full mb-12"
+      <motion.div
+        className="max-w-7xl mx-auto w-full mb-16"
         variants={titleVariants}
       >
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-bitcoinOrange text-center">
-          L&apos;équipe derrière la communauté Bitcoin Bénin
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-center">
+          L&apos;équipe derrière <br />
+          <span className="text-brand-orange">Bitcoin Bénin</span>
         </h2>
       </motion.div>
 
       {/*  Grille des membres */}
-      <motion.ul 
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 max-w-7xl w-full"
+      <motion.ul
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl w-full"
         variants={gridVariants}
       >
         {membres.map((membre, index) => (
           <motion.li
             key={index}
-            className="group bg-[#0f0f10] border border-[rgba(255,255,255,0.06)] rounded-2xl overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300"
+            className="group glass-panel rounded-2xl overflow-hidden border border-white/5 hover:bg-white/5 transition-all duration-300 hover:-translate-y-2"
             variants={cardVariants}
           >
             {/* Image */}
-            <div className="relative w-full h-80">
+            <div className="relative w-full h-72 overflow-hidden">
               <Image
                 src={membre.image}
                 alt={membre.nom}
                 fill
-                className="object-cover"
+                className="object-cover transition-transform duration-700 group-hover:scale-110"
                 priority={index < 4}
               />
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80"></div>
 
-            {/* Texte + Liens */}
-            <div className="p-6 text-center">
-              <h3 className="font-semibold text-lg mb-3">{membre.nom}</h3>
-              <div className="flex justify-center space-x-6">
+              {/* Liens sur l'image */}
+              <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">
                 {membre.twitter && <a
                   href={membre.twitter}
-                  className="hover:text-twitter transition-colors"
+                  className="p-2 rounded-full bg-black/50 hover:bg-brand-orange text-white transition-colors"
                   target="_blank" rel="noopener noreferrer"
                 >
-                  <FaTwitter size={28} />
+                  <FaTwitter size={18} />
                 </a>}
                 {membre.linkedin && <a
                   href={membre.linkedin}
-                  className="hover:text-linkedin transition-colors"
+                  className="p-2 rounded-full bg-black/50 hover:bg-brand-orange text-white transition-colors"
                   target="_blank" rel="noopener noreferrer"
                 >
-                  <FaLinkedin size={28} />
+                  <FaLinkedin size={18} />
                 </a>}
                 {membre.facebook && <a
                   href={membre.facebook}
-                  className="hover:text-facebook transition-colors"
+                  className="p-2 rounded-full bg-black/50 hover:bg-brand-orange text-white transition-colors"
                   target="_blank" rel="noopener noreferrer"
                 >
-                  <FaFacebook size={28} />
+                  <FaFacebook size={18} />
                 </a>}
               </div>
+            </div>
+
+            {/* Texte */}
+            <div className="p-4 text-center">
+              <h3 className="font-bold text-white text-lg tracking-tight group-hover:text-brand-orange transition-colors duration-300">
+                {membre.nom}
+              </h3>
             </div>
           </motion.li>
         ))}
       </motion.ul>
 
       {/*  Barre blanche */}
-      <div className="w-full h-[3px] bg-white opacity-20 mt-16"></div>
+      <div className="w-full max-w-7xl h-px bg-white/10 mt-24"></div>
 
     </motion.section>
   );

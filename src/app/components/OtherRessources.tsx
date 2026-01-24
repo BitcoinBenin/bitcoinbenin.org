@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 const ressources = [
   {
@@ -27,46 +27,40 @@ const ressources = [
 
 export default function RessourcesCommunaute() {
   return (
-    <section className="bg-hero-gradient-dark text-white py-20 px-6">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-20 px-6 relative">
+      <div className="max-w-7xl mx-auto relative z-10">
 
-        {/* ✅ Titre aligné à gauche et orange Bitcoin */}
-        <h2
-          className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-16 tracking-tight text-left"
-          style={{ color: "" }}
-        >
-          Les ressources de la communauté
+        <h2 className="text-3xl md:text-5xl font-bold mb-16 tracking-tight text-white">
+          Les ressources de la <span className="text-brand-orange">communauté</span>
         </h2>
 
-        {/* ✅ Grid des ressources */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 text-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
 
           {ressources.map((item, index) => (
-            <div key={index} className="flex flex-col items-center">
+            <div key={index} className="glass-panel p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 group">
 
               {/* Image */}
-              <div className="w-full h-56 bg-black/20 rounded-lg overflow-hidden mb-6">
+              <div className="w-full h-48 rounded-xl overflow-hidden mb-6 relative">
                 <Image
                   src={item.image}
                   alt={item.title}
-                  width={400}
-                  height={300}
-                  className="object-cover w-full h-full"
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
 
-              {/* ✅ Découvrir + icône orange Bitcoin */}
+              {/* Link */}
               <Link
                 href={item.link}
-                className="flex items-center justify-center gap-2 uppercase text-sm font-bold tracking-wider"
-                style={{ color: "#F7931A" }}
+                className="flex items-center gap-2 uppercase text-xs font-bold tracking-wider text-brand-orange hover:text-white mb-3 transition-colors"
+                target="_blank"
               >
                 Découvrir
-                <ExternalLink size={16} style={{ color: "#F7931A" }} />
+                <FaExternalLinkAlt size={12} />
               </Link>
 
               {/* Description */}
-              <p className="text-gray-300 mt-3 text-sm sm:text-base font-medium">
+              <p className="text-gray-300 text-sm font-medium leading-relaxed group-hover:text-white transition-colors">
                 {item.title}
               </p>
             </div>

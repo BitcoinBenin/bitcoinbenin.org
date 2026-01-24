@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 const autresRessources = [
   {
@@ -23,17 +23,17 @@ const autresRessources = [
     title: "Dictionnaire de Bitcoin, par Loïc Pandul.",
     link: "https://planb.academy/fr/resources/glossary"
   },
-   {
+  {
     image: "/BTCmap.webp",
     title: "Carte des commerces acceptant Bitcoin dans le monde.",
     link: "https://btcmap.org/map#15/12.11209/-68.91119"
   },
-   {
+  {
     image: "/carte.png",
     title: "Carte des communautés Bitcoin dans le monde.",
     link: "https://btcmap.org/map#15/12.11209/-68.91119"
   },
-   {
+  {
     image: "/8543eb7d1ba409ca6f0030d7180e88cd237fc221-1200x630-1-uai-720x540.jpg",
     title: "Maison d’édition de livres Bitcoin Konsensus Network.",
     link: "https://bitcoinbook.shop/collections/french"
@@ -42,46 +42,40 @@ const autresRessources = [
 
 export default function AutresRessourcesUtiles() {
   return (
-    <section className="bg-anthracite text-white py-20 px-6">
-      <div className="max-w-7xl mx-auto text-center">
+    <section className="py-20 px-6 relative">
+      <div className="max-w-7xl mx-auto text-left relative z-10">
 
-        {/* ✅ Titre centré */}
-        <h2
-          className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-16 tracking-tight text-left"
-          style={{ color: "" }}
-        >
-         Autes Ressources Utiles
+        <h2 className="text-3xl md:text-5xl font-bold mb-16 tracking-tight text-white">
+          Autres Ressources <span className="text-brand-orange">Utiles</span>
         </h2>
 
-        {/* ✅ Grid des ressources */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
 
           {autresRessources.map((item, index) => (
-            <div key={index} className="flex flex-col items-center">
+            <div key={index} className="glass-panel p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 group">
 
-              {/* Image plus grande */}
-              <div className="w-full h-60 rounded-lg overflow-hidden mb-6 bg-black/25">
+              {/* Image */}
+              <div className="w-full h-48 rounded-xl overflow-hidden mb-6 relative">
                 <Image
                   src={item.image}
                   alt={item.title}
-                  width={450}
-                  height={300}
-                  className="object-cover w-full h-full"
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
 
-              {/* ✅ Bouton “DÉCOUVRIR” orange + icône */}
+              {/* Link */}
               <Link
                 href={item.link}
-                className="flex items-center justify-center gap-2 uppercase text-sm font-bold mb-3"
-                style={{ color: "#F7931A" }}
+                className="flex items-center gap-2 uppercase text-xs font-bold tracking-wider text-brand-orange hover:text-white mb-3 transition-colors"
+                target="_blank"
               >
                 Découvrir
-                <ExternalLink size={16} />
+                <FaExternalLinkAlt size={12} />
               </Link>
 
-              {/* ✅ Texte descriptif centré */}
-              <p className="text-gray-300 text-base font-medium">
+              {/* Description */}
+              <p className="text-gray-300 text-sm font-medium leading-relaxed group-hover:text-white transition-colors">
                 {item.title}
               </p>
 

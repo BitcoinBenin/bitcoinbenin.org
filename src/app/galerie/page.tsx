@@ -1,18 +1,8 @@
-import { getGalleryData } from '@/lib/gallery';
-import GalleryClient from './GalleryClient';
-import { Suspense } from 'react';
+// Redirection vers la page gallery principale
+import { redirect } from 'next/navigation';
 
-// Cette page est maintenant un Server Component, elle s'exécute côté serveur.
-export default async function GaleriePage() {
-  // 1. Récupère les données directement sur le serveur au moment de la construction ou de la requête.
-  const galleryData = await getGalleryData();
-
-  // 2. Passe les données pré-chargées au composant client, qui gérera l'interactivité.
-  return (
-    <Suspense fallback={<LoadingState />}>
-      <GalleryClient initialData={galleryData} />
-    </Suspense>
-  );
+export default function GaleriePage() {
+  redirect('/gallery');
 }
 
 // Un composant simple pour l'état de chargement, utilisé par Suspense.

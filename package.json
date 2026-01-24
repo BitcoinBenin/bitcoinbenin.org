@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/storage-js": "^2.91.0",
+    "@supabase/supabase-js": "^2.91.0",
     "@vercel/blob": "^2.0.0",
     "framer-motion": "^12.23.24",
     "hero": "^0.0.0",

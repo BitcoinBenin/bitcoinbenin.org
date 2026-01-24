@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'placehold.co' },
       { protocol: 'https', hostname: 'drive.google.com' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+      { protocol: 'https', hostname: 'hgnwadiljauqbhsbtxkk.supabase.co' },
     ],
     // Optimiser le format des images
     formats: ['image/avif', 'image/webp'],

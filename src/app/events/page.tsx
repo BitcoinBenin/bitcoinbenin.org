@@ -1,141 +1,243 @@
-import React from 'react';
-import Image from 'next/image';
-import { EVENTS } from '../data';
-import Link from 'next/link';
-import type { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: "Événements",
-  description: "Découvrez les événements Bitcoin Bénin : meetups, conférences, ateliers et formations. Participez à notre communauté pour apprendre et échanger sur Bitcoin au Bénin.",
-};
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import Link from 'next/link';
+import { FaCalendarAlt, FaMapMarkerAlt, FaArrowRight } from 'react-icons/fa';
+
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  location_link?: string;
+  image?: string;
+  registration_link?: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export default function EventsPage() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('date', { ascending: true });
+
+      if (error) {
+        console.error('Erreur lors du chargement des événements:', error);
+      } else {
+        setEvents(data || []);
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const now = new Date();
-  // Upcoming events are those with no start date (recurring) or a future start date
-  const upcomingEvents = EVENTS.filter(
-    (event) => !event.startDate || new Date(event.startDate) >= now
+  now.setHours(0, 0, 0, 0);
+  
+  // Upcoming events are those with date >= today
+  const upcomingEvents = events.filter(
+    (event) => new Date(event.date) >= now
   );
-  // Past events are those with a start date in the past
-  const pastEvents = EVENTS.filter(
-    (event) => event.startDate && new Date(event.startDate) < now
+  // Past events are those with date < today
+  const pastEvents = events.filter(
+    (event) => new Date(event.date) < now
   );
 
-  const EventCard = ({ event }: { event: (typeof EVENTS)[0] }) => (
-    <article key={event.id} className="group relative flex flex-col items-start justify-between bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-green-500/20 transform hover:-translate-y-2 transition-all duration-300">
-      <div className="relative w-full h-72 rounded-xl overflow-hidden mb-6">
-        <Image
-          src={event.posterImage}
+  const EventCard = ({ event }: { event: Event }) => (
+    <article key={event.id} className="group bg-brand-charcoal/50 border border-white/5 rounded-xl overflow-hidden hover:border-brand-green/50 transition-all duration-300">
+      <div className="relative h-64 overflow-hidden">
+        <img
+          src={event.image || '/event.webp'}
           alt={`Affiche pour ${event.title}`}
-          fill
-          style={{ objectFit: 'cover' }}
-          className="group-hover:scale-105 transition-transform duration-500"
-          quality={80}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => {
+            console.error('Erreur chargement image:', event.image);
+            // Fallback vers l'image par défaut
+            e.currentTarget.src = '/event.webp';
+          }}
+          onLoad={() => {
+            console.log('Image chargée avec succès:', event.image);
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
       </div>
-      <div className="w-full">
-        <div className="flex items-center gap-x-4 text-xs mb-3">
-          <time dateTime={event.date} className="text-gray-600 font-semibold flex items-center gap-1.5">
-            {React.createElement(event.iconCalendar, { className: "h-4 w-4 text-green-600" })} {event.date}
-          </time>
-          <span className="relative z-10 rounded-full bg-green-100 px-3 py-1.5 font-medium text-green-700">
-            {event.time}
-          </span>
+      
+      <div className="flex-1 w-full">
+        <div className="flex items-center gap-2 mb-3">
+          <FaCalendarAlt className="text-brand-green" />
+          <span className="text-brand-green font-medium">{event.date}</span>
+          <span className="text-gray-400">•</span>
+          <span className="text-gray-300">{event.time}</span>
         </div>
-        <h3 className="mt-2 text-xl font-bold leading-7 text-gray-900 group-hover:text-green-600 transition-colors">
-          <Link href={`/events/${event.id}`}>
-            <span className="absolute inset-0" />
-            {event.title}
-          </Link>
+        
+        <h3 className="text-2xl font-display font-bold text-white mb-3 group-hover:text-brand-green transition-colors">
+          {event.title}
         </h3>
-        <p className="mt-4 line-clamp-3 text-sm leading-6 text-gray-600">{event.description}</p>
-        <div className="relative mt-6 flex items-center gap-x-3">
-          {React.createElement(event.iconLocation, { className: "h-5 w-5 text-green-600 flex-shrink-0" })}
-          <div className="text-sm leading-6">
-            <a 
-              href={event.locationLink}
+        
+        <p className="text-gray-400 mb-4 line-clamp-3 leading-relaxed">
+          {event.description}
+        </p>
+        
+        <div className="flex items-center gap-2 mb-4">
+          <FaMapMarkerAlt className="text-brand-accent" />
+          <span className="text-gray-300">{event.location}</span>
+        </div>
+        
+        <div className="flex gap-3">
+          {event.registration_link && (
+            <Link
+              href={event.registration_link}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-semibold text-gray-800 hover:text-green-600 transition-colors duration-300"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green text-white rounded-lg hover:bg-brand-accent transition-colors"
             >
-              {event.location}
-            </a>
-          </div>
-        </div>
-        <div className="mt-8 w-full">
-          <Link href={`/events/${event.id}`} className="btn-primary-green w-full text-center inline-flex items-center justify-center gap-2 text-white font-bold py-3 px-6 rounded-lg text-base">
-            Détails et Inscription {React.createElement(event.iconArrowRight, { className: "h-4 w-4" })}
-          </Link>
+              S&apos;inscrire
+              <FaArrowRight className="text-sm" />
+            </Link>
+          )}
+          
+          {event.location_link && (
+            <Link
+              href={event.location_link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-dark border border-white/10 text-gray-300 rounded-lg hover:border-brand-green/50 transition-colors"
+            >
+              <FaMapMarkerAlt className="text-sm" />
+              Localisation
+            </Link>
+          )}
         </div>
       </div>
     </article>
   );
 
-  return (
-    <div className="bg-gray-100">
-      {/* Hero Section */}
-      <section className="relative h-[60vh] flex items-center justify-center text-white overflow-hidden">
-        <Image
-          src="/event.webp"
-          alt="Événements Bitcoin Bénin"
-          fill
-          style={{ objectFit: 'cover' }}
-          className="z-0"
-          priority
-          quality={80}
-        />
-        <div className="absolute inset-0 bg-black/70 z-10"></div>
-        <div className="relative z-20 text-center max-w-3xl px-4">
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-white text-glow-green animate-float">
-            Nos Évènements
-          </h1>
-          <p className="mt-6 text-xl text-gray-200 max-w-2xl mx-auto">
-            Découvrez les rencontres, ateliers et conférences organisés par la communauté Bitcoin Bénin.
-          </p>
-        </div>
-      </section>
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-white">Chargement des événements...</div>
+      </div>
+    );
+  }
 
-      {/* Upcoming Events Section */}
-      {upcomingEvents.length > 0 && (
-        <section className="py-20 sm:py-32">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl text-center w-full">
-              <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl text-center w-full">
-                Événements à venir
-              </h2>
-              <p className="mt-6 text-lg leading-8 text-gray-600 text-center w-full">
-                Participez à nos prochains événements pour apprendre, échanger et vous connecter avec la communauté.
+  if (!supabase) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-display font-bold text-white mb-4">Configuration requise</h2>
+          <p className="text-gray-400">Veuillez configurer Supabase pour afficher les événements.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-brand-dark">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-40 pb-8">
+        <header className="text-center mb-8">
+          <h1 className="text-5xl md:text-6xl font-display font-black text-white mb-4">
+            Événements
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-green to-brand-accent ml-2">
+              Bitcoin Bénin
+            </span>
+          </h1>
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+            Rejoignez-nous pour des meetups, ateliers et conférences sur Bitcoin. 
+            Apprenez, échangez et développez vos connaissances avec notre communauté.
+          </p>
+        </header>
+
+        {/* Événements à venir */}
+        <section className="mb-8">
+          <h2 className="text-3xl font-display font-bold text-white mb-4 flex items-center gap-3">
+            <FaCalendarAlt className="text-brand-green" />
+            Événements à venir ({upcomingEvents.length})
+          </h2>
+          
+          {upcomingEvents.length === 0 ? (
+            <div className="text-center py-16 bg-brand-charcoal/30 rounded-3xl border border-white/5">
+              <FaCalendarAlt className="text-6xl text-gray-500 mx-auto mb-4" />
+              <h3 className="text-2xl font-display font-bold text-gray-300 mb-2">
+                Aucun événement à venir
+              </h3>
+              <p className="text-gray-400">
+                Revenez bientôt pour découvrir nos prochains événements Bitcoin Bénin !
               </p>
             </div>
-            <div className="mx-auto mt-20 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-24 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {upcomingEvents.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
             </div>
-          </div>
+          )}
         </section>
-      )}
 
-      {/* Past Events Section */}
-      {pastEvents.length > 0 && (
-        <section className="py-20 sm:py-32 bg-gray-200">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl text-center w-full">
-              <h2 className="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl text-center w-full">
-                Événements passés
-              </h2>
-              <p className="mt-6 text-lg leading-8 text-gray-600 text-center w-full">
-                Revivez nos anciens événements et consultez les ressources associées.
-              </p>
-            </div>
-            <div className="mx-auto mt-20 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-24 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+        {/* Événements passés */}
+        {pastEvents.length > 0 && (
+          <section>
+            <h2 className="text-3xl font-display font-bold text-white mb-4 flex items-center gap-3">
+              <FaCalendarAlt className="text-gray-400" />
+              Événements passés ({pastEvents.length})
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {pastEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
+                <article key={event.id} className="group relative flex flex-col items-start justify-between p-6 rounded-3xl bg-brand-charcoal/30 backdrop-blur-md border border-white/5 opacity-75">
+                  <div className="relative w-full h-72 rounded-2xl overflow-hidden mb-6 border border-white/5">
+                    <img
+                      src={event.image || '/event.webp'}
+                      alt={`Affiche pour ${event.title}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 grayscale"
+                    />
+                  </div>
+                  
+                  <div className="flex-1 w-full">
+                    <div className="flex items-center gap-2 mb-3">
+                      <FaCalendarAlt className="text-gray-400" />
+                      <span className="text-gray-400 font-medium">{event.date}</span>
+                      <span className="text-gray-500">•</span>
+                      <span className="text-gray-400">{event.time}</span>
+                    </div>
+                    
+                    <h3 className="text-2xl font-display font-bold text-gray-300 mb-3">
+                      {event.title}
+                    </h3>
+                    
+                    <p className="text-gray-500 mb-4 line-clamp-2 leading-relaxed">
+                      {event.description}
+                    </p>
+                    
+                    <div className="flex items-center gap-2">
+                      <FaMapMarkerAlt className="text-gray-400" />
+                      <span className="text-gray-400">{event.location}</span>
+                    </div>
+                  </div>
+                </article>
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        )}
+      </div>
     </div>
   );
 }

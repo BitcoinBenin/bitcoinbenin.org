@@ -5,119 +5,115 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { NAV_LINKS, SOCIAL_LINKS } from '../data';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import Button from './ui/Button';
+import TopBanner from './TopBanner';
 
 export default function Header() {
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Fermer le menu mobile quand la taille de l'écran change
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setIsMenuOpen(false);
-      }
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
     };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fermer le menu mobile quand on clique sur un lien
-  const closeMenu = () => {
-    setIsMenuOpen(false);
-  };
-
   return (
-    <header className="sticky top-0 left-0 w-full z-30 text-white bg-hero-gradient-dark shadow-md">
-      <nav className="max-w-[1400px] mx-auto flex items-center justify-between p-4 md:p-6" role="navigation" aria-label="Navigation principale">
-        <Link href="/" className="flex items-center z-50">
-          <Image 
-            src="/logo.svg" 
-            alt="Bitcoin Benin Logo"
-            width={180} 
-            height={40} 
-            className="h-10 w-auto"
-          />
+    <header
+      className={`fixed left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-out w-full max-w-5xl px-4 ${isScrolled ? 'top-6' : 'top-8 lg:top-12'
+        }`}
+    >
+      <div className={`
+        relative flex items-center justify-between px-2 py-2 md:px-6 md:py-3 rounded-full 
+        transition-all duration-300
+        ${isScrolled
+          ? 'bg-brand-charcoal/80 backdrop-blur-xl border border-white/10 shadow-glass w-full'
+          : 'bg-brand-charcoal/40 backdrop-blur-md border border-white/5 shadow-lg w-full'
+        }
+      `}>
+
+        <Link href="/" className="relative z-50 pl-2">
+          <div className="relative h-8 w-32 md:h-9 md:w-36">
+            <Image
+              src="/logo.svg"
+              alt="Bitcoin Benin"
+              fill
+              className="object-contain"
+            />
+          </div>
         </Link>
-        
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex gap-4 uppercase font-bold tracking-widest text-sm">
+
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/5">
           {NAV_LINKS.map((link) => (
-            <a 
-              key={link.name} 
-              href={link.href} 
-              className="hover:text-green-500 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 rounded px-2 py-1"
+            <Link
+              key={link.name}
+              href={link.href}
+              className="text-xs font-medium text-gray-300 hover:text-white px-4 py-2 rounded-full hover:bg-white/10 transition-all"
             >
               {link.name}
-            </a>
+            </Link>
           ))}
+        </nav>
+
+        <div className="hidden md:flex items-center pl-2">
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => window.open('https://t.me/+vUzohmB0EFMzZTI8', '_blank')}
+            className="!rounded-full px-6 text-xs"
+          >
+            Rejoindre
+          </Button>
         </div>
 
-        {/* Social Links (visible on desktop) */}
-        <div className="hidden md:flex gap-4 text-lg">
+        {/* Mobile Toggle */}
+        <button
+          className="md:hidden text-white p-2 hover:text-brand-green transition-colors pr-2"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          {isMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+        </button>
+      </div>
+
+      {/* TopBanner Positioned Below Navbar */}
+      <div className="flex justify-center mt-3 relative z-40">
+        <TopBanner />
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      <div
+        className={`fixed inset-0 bg-brand-dark/95 backdrop-blur-2xl z-[-1] flex flex-col items-center justify-center gap-8 transition-all duration-500 ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+          }`}
+        style={{ top: '-100px', height: '140vh' }}
+      >
+        {NAV_LINKS.map((link) => (
+          <Link
+            key={link.name}
+            href={link.href}
+            className="text-2xl font-bold text-gray-300 hover:text-brand-green transition-colors"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            {link.name}
+          </Link>
+        ))}
+
+        <div className="flex gap-4 mt-8">
           {SOCIAL_LINKS.map((link, index) => (
-            <a 
-              key={index} 
-              href={link.href} 
+            <a
+              key={index}
+              href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-full p-1"
-              aria-label={`Suivez-nous sur ${link.icon.name || 'réseau social'}`}
+              className="p-3 rounded-full bg-white/5 text-gray-400 hover:bg-brand-green hover:text-white transition-all"
             >
-              <link.icon />
+              <link.icon size={20} />
             </a>
           ))}
         </div>
-
-        {/* Mobile Menu Button */}
-        <div className="md:hidden z-50">
-          <button 
-            onClick={() => setIsMenuOpen(!isMenuOpen)} 
-            className="text-2xl focus:outline-none focus:ring-2 focus:ring-green-500 rounded p-1"
-            aria-expanded={isMenuOpen}
-            aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-          >
-            {isMenuOpen ? <FaTimes /> : <FaBars />}
-          </button>
-        </div>
-
-        {/* Mobile Menu Overlay */}
-        {isMenuOpen && (
-          <div 
-            className="md:hidden fixed inset-0 bg-hero-gradient-dark flex flex-col items-center justify-center gap-10"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menu de navigation"
-          >
-            <div className="flex flex-col items-center gap-8 uppercase font-bold tracking-widest text-lg">
-              {NAV_LINKS.map((link) => (
-                <a 
-                  key={link.name} 
-                  href={link.href} 
-                  className="hover:text-green-500 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 rounded px-4 py-2"
-                  onClick={closeMenu}
-                >
-                  {link.name}
-                </a>
-              ))}
-            </div>
-            <div className="flex gap-6 text-2xl mt-8">
-              {SOCIAL_LINKS.map((link, index) => (
-                <a 
-                  key={index} 
-                  href={link.href} 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-full p-2"
-                  onClick={closeMenu}
-                  aria-label={`Suivez-nous sur ${link.icon.name || 'réseau social'}`}
-                >
-                  <link.icon />
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-      </nav>
+      </div>
     </header>
   );
 }

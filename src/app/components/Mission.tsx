@@ -1,85 +1,52 @@
 'use client';
 
-import { FaArrowRight } from 'react-icons/fa';
 import { MISSIONS } from '../data';
-import { motion, easeOut } from 'framer-motion';
+import { motion } from 'framer-motion';
+import Card from './ui/Card';
+import Link from 'next/link';
+import { FaArrowRight } from 'react-icons/fa';
 
 export default function Mission() {
-  const missions = MISSIONS;
-
-  const sectionVariants = {
-    hidden: {},
-    show: {
-      transition: {
-        staggerChildren: 0.15,
-      },
-    },
-  };
-
-  const titleVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: easeOut } },
-  };
-
-  const cardGridVariants = {
-    hidden: {},
-    show: {
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    show: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: easeOut } },
-  };
-
   return (
-    <motion.section
-      className="bg-gray-50 py-24 -mt-1 relative z-10"
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.1 }}
-      variants={sectionVariants}
-    >
+    <section className="py-24 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div className="text-center" variants={titleVariants}>
-          <h2 className="text-4xl font-bold text-gray-800 sm:text-5xl tracking-tight">
-            Nos missions
+        <div className="text-center mb-16">
+          <span className="text-brand-orange font-semibold tracking-wide uppercase text-sm">Notre Mission</span>
+          <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
+            Construire l&apos;Infrastructure Financière
           </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
-            Au cœur de notre action : démocratiser Bitcoin pour tous.
+          <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-400">
+            Démocratiser l&apos;accès au savoir et à la souveraineté monétaire via Bitcoin.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="mt-20 grid md:grid-cols-2 lg:grid-cols-3 gap-10"
-          variants={cardGridVariants}
-        >
-          {missions.map((mission) => (
+        <div className="grid md:grid-cols-3 gap-8">
+          {MISSIONS.map((mission, index) => (
             <motion.div
-              key={mission.title}
-              className="group bg-white rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 flex flex-col"
-              variants={cardVariants}
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
             >
-              <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-8">
-                <mission.icon className="text-4xl text-green-600 transition-transform duration-300 group-hover:rotate-12" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 text-center">{mission.title}</h3>
-              <p className="mt-4 text-base text-gray-600 text-center flex-grow">{mission.description}</p>
-              <div className="text-center mt-8">
-                <a
-                  href={mission.href}
-                  className="btn-mission inline-flex items-center gap-2 text-white font-bold py-3 px-6 rounded-xl text-sm uppercase"
-                >
-                  {mission.buttonText} <FaArrowRight />
-                </a>
-              </div>
+              <Card className="h-full flex flex-col p-8 hover:shadow-glow-hover transition-all duration-500 group" variant="glass">
+                <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mb-6 text-brand-orange group-hover:bg-brand-orange group-hover:text-white transition-all duration-300 shadow-glass">
+                  <mission.icon className="text-2xl" />
+                </div>
+
+                <h3 className="text-xl font-bold text-white mb-3">{mission.title}</h3>
+                <p className="text-gray-400 mb-8 leading-relaxed flex-grow group-hover:text-gray-300 transition-colors">
+                  {mission.description}
+                </p>
+
+                <Link href={mission.href} className="inline-flex items-center text-brand-orange font-semibold hover:gap-2 transition-all">
+                  {mission.buttonText} <FaArrowRight className="ml-2 text-sm" />
+                </Link>
+              </Card>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
