@@ -7,10 +7,14 @@ import { NAV_LINKS, SOCIAL_LINKS } from '../data';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import Button from './ui/Button';
 import TopBanner from './TopBanner';
+import { usePathname } from 'next/navigation';
+
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,21 +45,33 @@ export default function Header() {
               alt="Bitcoin Benin"
               fill
               className="object-contain"
+              priority
             />
           </div>
         </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/5">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className="text-xs font-medium text-gray-300 hover:text-white px-4 py-2 rounded-full hover:bg-white/10 transition-all"
-            >
-              {link.name}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+  const isActive = pathname === link.href;
+
+  return (
+    <Link
+      key={link.name}
+      href={link.href}
+      className={`
+        text-xs font-medium px-4 py-2 rounded-full transition-all
+        ${isActive
+          ? 'text-white bg-white/15 shadow-inner'
+          : 'text-gray-300 hover:text-white hover:bg-white/10'
+        }
+      `}
+    >
+      {link.name}
+    </Link>
+  );
+})}
+
         </nav>
 
         <div className="hidden md:flex items-center pl-2">

@@ -30,7 +30,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #008850;
+  background: #53CB60;
 }
 
 @layer utilities {

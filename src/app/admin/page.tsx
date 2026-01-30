@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Button from '@/app/components/ui/Button';
 import { FaImages, FaCalendarAlt, FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaSignOutAlt } from 'react-icons/fa';
+import { createEvent, updateEvent as updateEventAction, deleteEvent as deleteEventAction } from './event-actions';
 
 interface Event {
   id: string;
@@ -89,106 +90,122 @@ export default function AdminDashboard() {
     }
   };
 
-  const createEvent = async () => {
-    if (!supabase || !eventForm.title.trim()) return;
+  const addEvent = async () => {
+    if (!eventForm.title || !eventForm.date || !eventForm.location) {
+      alert('Veuillez remplir les champs obligatoires');
+      return;
+    }
+
+    console.log('📝 Formulaire brut:', eventForm);
+    
+    // Nettoyage et validation des données
+    const cleanTitle = String(eventForm.title).trim();
+    const cleanDescription = String(eventForm.description).trim();
+    const cleanDate = String(eventForm.date).trim();
+    const cleanTime = String(eventForm.time).trim();
+    const cleanLocation = String(eventForm.location).trim();
+    const cleanLocationLink = eventForm.location_link ? String(eventForm.location_link).trim() : undefined;
+    const cleanImage = eventForm.image ? String(eventForm.image).trim() : undefined;
+    const cleanRegistrationLink = eventForm.registration_link ? String(eventForm.registration_link).trim() : undefined;
+
+    console.log('📝 Données nettoyées:', {
+      cleanTitle,
+      cleanDate,
+      cleanLocation,
+      originalDate: eventForm.date,
+      dateType: typeof eventForm.date
+    });
+
+    // Validation finale après nettoyage
+    if (cleanTitle === '') {
+      alert('Le titre ne peut pas être vide');
+      return;
+    }
+    if (cleanDate === '') {
+      alert('La date ne peut pas être vide');
+      return;
+    }
+    if (cleanLocation === '') {
+      alert('Le lieu ne peut pas être vide');
+      return;
+    }
+
+    console.log('📝 Envoi formulaire nettoyé:', {
+      title: cleanTitle,
+      date: cleanDate,
+      location: cleanLocation
+    });
 
     try {
-      let imageUrl = eventForm.image;
-
-      // Upload de l'affiche si un fichier est sélectionné
-      if (posterFile) {
-        setUploadingPoster(true);
-        const fileExt = posterFile.name.split('.').pop();
-        const fileName = `event-poster-${Date.now()}.${fileExt}`;
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('gallery')
-          .upload(`events/${fileName}`, posterFile);
-
-        if (uploadError) {
-          console.error('Erreur upload affiche:', uploadError);
-          setUploadingPoster(false);
-          return;
-        }
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('gallery')
-          .getPublicUrl(uploadData.path);
-        
-        imageUrl = publicUrl;
-        setUploadingPoster(false);
-      }
-
-      const { data, error } = await supabase
-        .from('events')
-        .insert({
-          title: eventForm.title,
-          description: eventForm.description,
-          date: eventForm.date,
-          time: eventForm.time,
-          location: eventForm.location,
-          location_link: eventForm.location_link,
-          image: imageUrl,
-          registration_link: eventForm.registration_link
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Erreur lors de la création de l\'événement:', error);
-      } else {
-        setEvents([data, ...events]);
+      setUploadingPoster(true);
+      
+      const result = await createEvent(
+        cleanTitle,
+        cleanDescription,
+        cleanDate,
+        cleanTime,
+        cleanLocation,
+        cleanLocationLink,
+        cleanImage,
+        cleanRegistrationLink,
+        posterFile || undefined
+      );
+      
+      if (result.success) {
+        setEvents([result.data, ...events]);
         resetEventForm();
       }
     } catch (error) {
       console.error('Erreur:', error);
+      alert('Erreur lors de la création de l\'événement');
+    } finally {
       setUploadingPoster(false);
     }
   };
 
-  const updateEvent = async () => {
-    if (!supabase || !editingEvent) return;
+  const updateEventLocal = async () => {
+    if (!editingEvent) return;
 
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .update({
-          title: eventForm.title,
-          description: eventForm.description,
-          date: eventForm.date,
-          time: eventForm.time,
-          location: eventForm.location,
-          location_link: eventForm.location_link,
-          image: eventForm.image,
-          registration_link: eventForm.registration_link
-        })
-        .eq('id', editingEvent.id)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Erreur lors de la mise à jour de l\'événement:', error);
-      } else {
-        setEvents(events.map(e => e.id === editingEvent.id ? data : e));
+      setUploadingPoster(true);
+      
+      const result = await updateEventAction(
+        editingEvent.id,
+        String(eventForm.title),
+        String(eventForm.description),
+        String(eventForm.date),
+        String(eventForm.time),
+        String(eventForm.location),
+        eventForm.location_link ? String(eventForm.location_link) : undefined,
+        eventForm.image ? String(eventForm.image) : undefined,
+        eventForm.registration_link ? String(eventForm.registration_link) : undefined,
+        posterFile || undefined
+      );
+      
+      if (result.success) {
+        setEvents(events.map(e => e.id === editingEvent.id ? result.data : e));
         resetEventForm();
       }
     } catch (error) {
       console.error('Erreur:', error);
+      alert('Erreur lors de la mise à jour de l\'événement');
+    } finally {
+      setUploadingPoster(false);
     }
   };
 
   const deleteEvent = async (eventId: string) => {
-    if (!supabase || !confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) return;
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) return;
 
     try {
-      await supabase
-        .from('events')
-        .delete()
-        .eq('id', eventId);
-
-      setEvents(events.filter(e => e.id !== eventId));
+      const result = await deleteEventAction(eventId);
+      
+      if (result.success) {
+        setEvents(events.filter(e => e.id !== eventId));
+      }
     } catch (error) {
-      console.error('Erreur lors de la suppression de l\'événement:', error);
+      console.error('Erreur:', error);
+      alert('Erreur lors de la suppression de l\'événement');
     }
   };
 
@@ -449,7 +466,7 @@ export default function AdminDashboard() {
                 <div className="flex gap-3">
                   <Button
                     variant="primary"
-                    onClick={editingEvent ? updateEvent : createEvent}
+                    onClick={editingEvent ? updateEventLocal : addEvent}
                     disabled={!eventForm.title.trim() || uploadingPoster}
                     className="flex items-center gap-2"
                   >

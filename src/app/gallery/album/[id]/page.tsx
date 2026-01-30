@@ -3,7 +3,9 @@
 import { useState, useEffect, use, useCallback } from 'react';
 import { supabase, GalleryImage, Album } from '@/lib/supabase';
 import Link from 'next/link';
-import { FaArrowLeft, FaCalendarAlt, FaDownload } from 'react-icons/fa';
+import { FaArrowLeft, FaCalendarAlt, FaDownload, FaExpand } from 'react-icons/fa';
+import ImageLightbox from '@/app/components/ImageLightbox';
+import Image from 'next/image';
 
 interface AlbumPageProps {
   params: Promise<{
@@ -16,6 +18,7 @@ export default function AlbumPage({ params }: AlbumPageProps) {
   const [album, setAlbum] = useState<Album | null>(null);
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
 
   const fetchAlbumAndImages = useCallback(async () => {
     if (!supabase) return;
@@ -62,11 +65,16 @@ export default function AlbumPage({ params }: AlbumPageProps) {
   }, [fetchAlbumAndImages]);
 
   const getImageUrl = (filePath: string) => {
-    if (!supabase) return '';
-    const { data } = supabase.storage
-      .from('gallery')
-      .getPublicUrl(filePath);
-    return data.publicUrl;
+    if (!supabase) return '/gallery-placeholder.webp';
+    try {
+      const { data } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(filePath);
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Erreur URL Supabase:', error);
+      return '/gallery-placeholder.webp';
+    }
   };
 
   const handleDownload = async (imageUrl: string, fileName: string) => {
@@ -109,7 +117,7 @@ export default function AlbumPage({ params }: AlbumPageProps) {
 
   return (
     <div className="min-h-screen bg-brand-dark">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 pt-56">
         {/* Header avec retour */}
         <div className="mb-8">
           <Link 
@@ -167,23 +175,52 @@ export default function AlbumPage({ params }: AlbumPageProps) {
                 key={image.id}
                 className="group relative aspect-square rounded-xl overflow-hidden bg-brand-charcoal/50 border border-white/5 hover:border-brand-green/30 transition-all duration-300"
               >
-                <img
+                <Image
                   src={getImageUrl(image.file_path)}
                   alt={image.title}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  onError={() => {
+                  fill
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+                  onClick={() => setSelectedImage(image)}
+                  onError={(e) => {
                     console.error('Erreur chargement image:', getImageUrl(image.file_path));
+                    // Fallback vers une image par défaut
+                    e.currentTarget.src = '/gallery-placeholder.webp';
+                    e.currentTarget.onerror = null; // Éviter la boucle infinie
+                  }}
+                  onLoad={() => {
+                    // S'assurer que l'image se charge correctement
+                    console.log('Image chargée:', getImageUrl(image.file_path));
                   }}
                 />
                 
+                {/* Texte de fallback si l'image ne se charge toujours pas */}
+                <div className="absolute inset-0 flex items-center justify-center bg-brand-charcoal/80 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                  <div className="text-center p-4">
+                    <div className="text-brand-green font-bold text-lg mb-2">
+                      {image.title || album?.name}
+                    </div>
+                    <div className="text-gray-400 text-sm">
+                      Photo non disponible
+                    </div>
+                  </div>
+                </div>
+                
                 {/* Overlay au hover */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+                  <button
+                    onClick={() => setSelectedImage(image)}
+                    className="p-3 bg-brand-green/80 rounded-full hover:bg-brand-green transition-colors shadow-lg"
+                    title="Voir en grand"
+                  >
+                    <FaExpand className="text-white text-base" />
+                  </button>
+                  
                   <button
                     onClick={() => handleDownload(getImageUrl(image.file_path), image.title)}
-                    className="p-3 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
+                    className="p-3 bg-white/20 rounded-full hover:bg-white/30 transition-colors shadow-lg"
                     title="Télécharger"
                   >
-                    <FaDownload className="text-white" />
+                    <FaDownload className="text-white text-base" />
                   </button>
                 </div>
 
@@ -201,6 +238,14 @@ export default function AlbumPage({ params }: AlbumPageProps) {
             ))}
           </div>
         )}
+        
+        {/* Lightbox */}
+        <ImageLightbox
+          images={images}
+          selectedImage={selectedImage}
+          onClose={() => setSelectedImage(null)}
+          initialIndex={images.findIndex(img => img.id === selectedImage?.id)}
+        />
       </div>
     </div>
   );

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { supabase, Album, GalleryImage } from '@/lib/supabase';
-import ImageUpload from '@/app/components/ImageUpload';
-import ImageGallery from '@/app/components/ImageGallery';
+import { createAlbum as createAlbumAction, deleteAlbum as deleteAlbumAction, updateAlbumCover, setFirstImageAsCover } from '../actions';
+import ImageUploadWithActions from '@/app/components/ImageUploadWithActions';
+import ImageGalleryWithActions from '@/app/components/ImageGalleryWithActions';
 import Button from '@/app/components/ui/Button';
-import { FaPlus, FaTrash, FaImages } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaImages, FaImage, FaStar } from 'react-icons/fa';
 
 export default function AdminGalleryPage() {
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -65,74 +66,27 @@ export default function AdminGalleryPage() {
   };
 
   const createAlbum = async () => {
-    if (!supabase) {
-      console.error('Supabase n\'est pas configuré');
-      return;
-    }
-    
     if (!newAlbum.name.trim()) {
       console.error('Le nom de l\'album est vide');
       return;
     }
 
-    console.log('Création album:', newAlbum);
-    console.log('Supabase client:', !!supabase);
-
     try {
-      const { data, error } = await supabase
-        .from('albums')
-        .insert({
-          name: newAlbum.name,
-          description: newAlbum.description
-        })
-        .select()
-        .single();
-
-      console.log('Réponse Supabase création album:', { data, error });
-
-      if (error) {
-        console.error('Erreur lors de la création de l\'album:', error);
-      } else {
-        console.log('Album créé avec succès:', data);
-        setAlbums([data, ...albums]);
-        setNewAlbum({ name: '', description: '' });
-        setShowNewAlbumForm(false);
-      }
+      const data = await createAlbumAction(newAlbum.name, newAlbum.description);
+      console.log('Album créé avec succès:', data);
+      setAlbums([data, ...albums]);
+      setNewAlbum({ name: '', description: '' });
+      setShowNewAlbumForm(false);
     } catch (error) {
-      console.error('Erreur catch création album:', error);
+      console.error('Erreur lors de la création de l\'album:', error);
     }
   };
 
   const deleteAlbum = async (albumId: string) => {
-    if (!supabase || !confirm('Êtes-vous sûr de vouloir supprimer cet album et toutes ses photos ?')) return;
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cet album et toutes ses photos ?')) return;
 
     try {
-      // Récupérer les images de l'album pour les supprimer
-      const { data: images } = await supabase
-        .from('gallery_images')
-        .select('file_path')
-        .eq('album_id', albumId);
-
-      // Supprimer les fichiers du storage
-      if (images && images.length > 0) {
-        const filePaths = images.map(img => img.file_path);
-        await supabase.storage
-          .from('gallery')
-          .remove(filePaths);
-      }
-
-      // Supprimer les images de la base
-      await supabase
-        .from('gallery_images')
-        .delete()
-        .eq('album_id', albumId);
-
-      // Supprimer l'album
-      await supabase
-        .from('albums')
-        .delete()
-        .eq('id', albumId);
-
+      await deleteAlbumAction(albumId);
       setAlbums(albums.filter(a => a.id !== albumId));
       if (selectedAlbum === albumId) {
         setSelectedAlbum(null);
@@ -161,6 +115,40 @@ export default function AdminGalleryPage() {
 
   const handleImageDelete = (imageId: string) => {
     setAlbumImages(albumImages.filter(img => img.id !== imageId));
+  };
+
+  const setAsCover = async (imagePath: string) => {
+    if (!selectedAlbum) return;
+
+    try {
+      const updatedAlbum = await updateAlbumCover(selectedAlbum, imagePath);
+      setAlbums(albums.map(album => 
+        album.id === selectedAlbum ? updatedAlbum : album
+      ));
+      console.log('Photo de couverture mise à jour avec succès');
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la couverture:', error);
+    }
+  };
+
+  const handleSetFirstImageAsCover = async () => {
+    if (!selectedAlbum || albumImages.length === 0) return;
+
+    try {
+      const updatedAlbum = await setFirstImageAsCover(selectedAlbum);
+      setAlbums(albums.map(album => 
+        album.id === selectedAlbum ? updatedAlbum : album
+      ));
+      console.log('Première photo définie comme couverture avec succès');
+    } catch (error) {
+      console.error('Erreur lors de la définition de la première photo comme couverture:', error);
+    }
+  };
+
+  const isCoverImage = (imagePath: string) => {
+    if (!selectedAlbum) return false;
+    const album = albums.find(a => a.id === selectedAlbum);
+    return album?.cover_image === imagePath;
   };
 
   if (loading) {
@@ -272,7 +260,15 @@ export default function AdminGalleryPage() {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <h3 className="font-display font-bold text-white">{album.name}</h3>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-display font-bold text-white">{album.name}</h3>
+                          {album.cover_image && (
+                            <div className="bg-brand-green/20 text-brand-green text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                              <FaStar className="text-xs" />
+                              Couverture
+                            </div>
+                          )}
+                        </div>
                         {album.description && (
                           <p className="text-sm text-gray-400 line-clamp-1">{album.description}</p>
                         )}
@@ -307,18 +303,37 @@ export default function AdminGalleryPage() {
 
                 {/* Upload d'images */}
                 <div className="mb-8">
-                  <ImageUpload 
+                  <ImageUploadWithActions 
                     onUploadComplete={handleImageUpload}
                     albumId={selectedAlbum}
                   />
                 </div>
 
                 {/* Gallery d'images */}
-                <ImageGallery
-                  images={albumImages}
-                  onImageDelete={handleImageDelete}
-                  editable={true}
-                />
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-display font-bold text-white">Photos de l&apos;album</h3>
+                    {albumImages.length > 0 && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleSetFirstImageAsCover}
+                        className="flex items-center gap-2"
+                      >
+                        <FaImage />
+                        Première photo comme couverture
+                      </Button>
+                    )}
+                  </div>
+                  
+                  <ImageGalleryWithActions
+                    images={albumImages}
+                    onImageDelete={handleImageDelete}
+                    editable={true}
+                    onSetAsCover={setAsCover}
+                    isCoverImage={isCoverImage}
+                  />
+                </div>
               </div>
             ) : (
               <div className="bg-brand-charcoal/50 border border-white/5 rounded-xl p-12 text-center">

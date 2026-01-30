@@ -30,15 +30,18 @@ export default async function Page({ params }: EventPageProps) {
   }
 
   const generateGoogleCalendarLink = () => {
-    if (!event.startDate || !event.endDate) return '#';
+    if (!event.date) return '#';
 
     const formatGoogleDate = (dateStr: string) =>
       new Date(dateStr).toISOString().replace(/-|:|\.\d{3}Z/g, '');
 
+    const startDate = new Date(event.date);
+    const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // Ajouter 2 heures
+    
     const baseUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
     const urlParams = new URLSearchParams({
       text: event.title,
-      dates: `${formatGoogleDate(event.startDate)}Z/${formatGoogleDate(event.endDate)}Z`,
+      dates: `${formatGoogleDate(startDate.toISOString())}Z/${formatGoogleDate(endDate.toISOString())}Z`,
       details: event.description,
       location: event.location,
       ctz: 'Africa/Porto-Novo',
@@ -51,7 +54,7 @@ export default async function Page({ params }: EventPageProps) {
     <div className="bg-gray-50 text-gray-800">
       <section className="relative h-[50vh] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src={event.image}
+          src={event.imageUrl}
           alt={event.title}
           fill
           className="z-0 object-cover"
@@ -69,33 +72,28 @@ export default async function Page({ params }: EventPageProps) {
         <div className="mx-auto max-w-4xl px-6 lg:px-8 bg-white p-8 rounded-2xl shadow-lg">
           <div className="flex items-center gap-x-4 text-sm mb-6">
             <time dateTime={event.date} className="text-gray-600 flex items-center gap-1">
-              <FaCalendarAlt className="text-green-600" /> {event.date} - {event.time}
+              <FaCalendarAlt className="text-green-600" /> {event.date}
             </time>
-            <a
-              href={event.locationLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative z-10 rounded-full bg-green-50 px-3 py-1.5 font-medium text-green-600 hover:bg-green-100 transition-colors flex items-center gap-1.5"
-            >
+            <span className="relative z-10 rounded-full bg-green-50 px-3 py-1.5 font-medium text-green-600 transition-colors flex items-center gap-1.5">
               <FaMapMarkerAlt className="inline-block" /> {event.location}
-            </a>
+            </span>
           </div>
 
           <p className="mt-6 text-lg leading-8 text-gray-700">{event.description}</p>
 
           <div className="mt-10 w-full">
             <Image
-              src={event.posterImage}
+              src={event.imageUrl}
               alt={`Affiche pour ${event.title}`}
               width={800}
-              height={1200}
+              height={600}
               className="rounded-lg shadow-lg mx-auto"
             />
           </div>
 
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Link
-              href={event.registrationLink}
+              href="#"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-mission inline-flex items-center gap-2 text-white font-bold py-3 px-6 rounded-xl text-sm uppercase"
@@ -103,7 +101,7 @@ export default async function Page({ params }: EventPageProps) {
               S&apos;inscrire à l&apos;événement <FaArrowRight />
             </Link>
 
-            {event.startDate && event.endDate && new Date(event.startDate) >= new Date() && (
+            {event.date && new Date(event.date) >= new Date() && (
               <Link
                 href={generateGoogleCalendarLink()}
                 target="_blank"

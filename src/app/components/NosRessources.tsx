@@ -13,7 +13,7 @@ export default function NosRessources() {
         <div className="flex flex-col gap-8 order-2 lg:order-1">
           <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-tight">
             Entrez dans le <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-brand-accent">terrier du lapin</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-green to-brand-accent">terrier du lapin</span>
           </h1>
 
           <p className="text-lg text-gray-400 leading-relaxed">

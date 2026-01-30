@@ -21,7 +21,8 @@
     "react-dom": "^18",
     "react-icons": "^5.5.0",
     "recharts": "^3.3.0",
-    "ui": "^0.2.4"
+    "ui": "^0.2.4",
+    "website": "link:"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

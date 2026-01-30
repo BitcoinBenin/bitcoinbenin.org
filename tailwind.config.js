@@ -20,9 +20,9 @@ module.exports = {
         brand: {
           dark: '#020617',    // Deep Indigo/Slate Dark
           charcoal: '#0F172A', // Lighter Dark for cards
-          green: '#008850',   // Bitcoin Green (from logo)
-          accent: '#00A67E',  // Lighter green for hover
-          'green-dark': '#006B40', // Darker green for accents
+          green: '#53CB60',   // Nouvelle couleur principale (vert frais)
+          accent: '#53CB60',  // Lighter green for hover
+          'green-dark': '#3FA34C', // Version plus foncée de la nouvelle couleur
           electric: '#00D9FF', // Electric blue accent
           purple: '#8B5CF6',   // Purple accent for variety
           glass: 'rgba(2, 6, 23, 0.7)', // For glassmorphism
@@ -39,8 +39,8 @@ module.exports = {
       },
       boxShadow: {
         'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-        'glow': '0 0 20px -5px rgba(0, 136, 80, 0.3)',
-        'glow-hover': '0 0 30px -5px rgba(0, 136, 80, 0.5)',
+        'glow': '0 0 20px -5px rgba(83, 203, 96, 0.3)',
+        'glow-hover': '0 0 30px -5px rgba(83, 203, 96, 0.5)',
       },
       animation: {
         'float': 'float 8s ease-in-out infinite',

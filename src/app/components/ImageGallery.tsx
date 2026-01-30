@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { GalleryImage } from '@/lib/supabase';
-import { supabase } from '@/lib/supabase';
+import { supabase, supabaseAdmin } from '@/lib/supabase';
 import { FaDownload, FaTrash, FaExpand } from 'react-icons/fa';
+import Image from 'next/image';
 
 interface ImageGalleryProps {
   images: GalleryImage[];
@@ -25,17 +26,17 @@ export default function ImageGallery({ images, onImageDelete, editable = false }
 
   const handleDelete = async (imageId: string, filePath: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) return;
-    if (!supabase) return;
+    if (!supabaseAdmin) return;
 
     setLoading(imageId);
     try {
       // Suppression du fichier
-      await supabase.storage
+      await supabaseAdmin.storage
         .from('gallery')
         .remove([filePath]);
 
       // Suppression de l'entrée dans la base
-      await supabase
+      await supabaseAdmin
         .from('gallery_images')
         .delete()
         .eq('id', imageId);
@@ -81,9 +82,10 @@ export default function ImageGallery({ images, onImageDelete, editable = false }
             key={image.id}
             className="group relative aspect-square rounded-xl overflow-hidden bg-brand-charcoal/50 border border-white/5 hover:border-brand-green/30 transition-all duration-300"
           >
-            <img
+            <Image
               src={getImageUrl(image.file_path)}
               alt={image.title}
+              fill
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               onError={() => {
                 console.error('Erreur chargement image:', getImageUrl(image.file_path));
@@ -142,9 +144,11 @@ export default function ImageGallery({ images, onImageDelete, editable = false }
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-6xl max-h-[90vh]">
-            <img
+            <Image
               src={getImageUrl(selectedImage.file_path)}
               alt={selectedImage.title}
+              width={1200}
+              height={800}
               className="max-w-full max-h-[80vh] object-contain rounded-lg"
             />
             

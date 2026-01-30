@@ -1,13 +1,28 @@
 import type { Metadata } from "next";
-import { Inter, Orbitron, JetBrains_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
+import localFont from 'next/font/local';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AccessibilityPreferences from "./components/AccessibilityPreferences";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
-const orbitron = Orbitron({ subsets: ["latin"], variable: '--font-orbitron' });
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: '--font-jetbrains-mono' });
+const orbitron = localFont({ 
+  src: [
+    { path: '../fonts/Orbitron-VariableFont_wght.ttf', weight: '400' },
+    { path: '../fonts/Orbitron-Bold.ttf', weight: '700' }
+  ],
+  variable: '--font-orbitron',
+  display: 'swap'
+});
+const jetbrainsMono = localFont({ 
+  src: [
+    { path: '../fonts/JetBrainsMono-Regular.ttf', weight: '400' },
+    { path: '../fonts/JetBrainsMono-Bold.ttf', weight: '700' }
+  ],
+  variable: '--font-jetbrains-mono',
+  display: 'swap'
+});
 
 export const metadata: Metadata = {
   title: {

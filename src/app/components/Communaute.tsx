@@ -47,7 +47,7 @@ export default function Communaute() {
           <div>
             <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-tight">
               Qui sommes <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-brand-accent">nous ?</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-green to-brand-accent">nous ?</span>
             </h2>
           </div>
 

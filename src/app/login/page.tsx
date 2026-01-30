@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, clearSupabaseSession } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Button from '@/app/components/ui/Button';
 import { FaLock, FaEnvelope } from 'react-icons/fa';
@@ -18,13 +18,33 @@ export default function LoginPage() {
     const checkAuth = async () => {
       if (!supabase) return; // Sortir si Supabase n'est pas configuré
       
+      console.log('🔍 Vérification session existante...');
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        router.push('/admin/gallery');
-      }
+      console.log('Session trouvée:', session ? '✅ Oui' : '❌ Non');
+      
+      // TEMPORAIREMENT DÉSACTIVÉ - Pour permettre la déconnexion forcée
+      // if (session) {
+      //   console.log('🔄 Redirection vers admin...');
+      //   router.push('/admin/gallery');
+      // } else {
+      //   console.log('✅ Aucune session, affichage formulaire');
+      // }
+      console.log('🔧 Redirection désactivée temporairement');
     };
     checkAuth();
   }, [router]);
+
+  const handleLogout = async () => {
+    try {
+      console.log('🧹 Nettoyage de la session Supabase...');
+      await clearSupabaseSession();
+      console.log('✅ Session nettoyée avec succès');
+      // Forcer le rechargement de la page
+      window.location.reload();
+    } catch (error) {
+      console.error('❌ Erreur lors du nettoyage:', error);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,10 +161,18 @@ export default function LoginPage() {
               <FaLock />
               Accès Administrateur
             </h3>
-            <p className="text-xs text-gray-400 leading-relaxed">
+            <p className="text-xs text-gray-400 leading-relaxed mb-3">
               Cette page est réservée aux administrateurs de Bitcoin Bénin. 
               Pour obtenir l&apos;accès, veuillez contacter l&apos;équipe.
             </p>
+            
+            {/* Bouton de déconnexion forcée */}
+            <button
+              onClick={handleLogout}
+              className="w-full bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 rounded-lg px-3 py-2 text-red-400 text-xs transition-colors"
+            >
+              🚪 Forcer la déconnexion
+            </button>
           </div>
         </div>
       </div>

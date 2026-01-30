@@ -3,12 +3,15 @@
 import { useState, useEffect } from 'react';
 import { supabase, Album, GalleryImage } from '@/lib/supabase';
 import Link from 'next/link';
-import { FaImages, FaCalendarAlt, FaPhotoVideo } from 'react-icons/fa';
+import { FaImages, FaCalendarAlt, FaPhotoVideo, FaExpand, FaDownload } from 'react-icons/fa';
+import ImageLightbox from '@/app/components/ImageLightbox';
+import Image from 'next/image';
 
 export default function GalleryPage() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [recentImages, setRecentImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
 
   useEffect(() => {
     if (!supabase) {
@@ -54,11 +57,33 @@ export default function GalleryPage() {
   };
 
   const getImageUrl = (filePath: string) => {
-    if (!supabase) return '';
-    const { data } = supabase.storage
-      .from('gallery')
-      .getPublicUrl(filePath);
-    return data.publicUrl;
+    if (!supabase) return '/gallery-placeholder.webp';
+    try {
+      const { data } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(filePath);
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Erreur URL Supabase:', error);
+      return '/gallery-placeholder.webp';
+    }
+  };
+
+  const handleDownload = async (imageUrl: string, fileName: string) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+    }
   };
 
   if (loading) {
@@ -82,7 +107,7 @@ export default function GalleryPage() {
 
   return (
     <div className="min-h-screen bg-brand-dark">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-40 pb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-56 pb-8">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-display font-black text-white mb-4">
@@ -109,15 +134,39 @@ export default function GalleryPage() {
                   key={image.id}
                   className="group relative aspect-square rounded-lg overflow-hidden bg-brand-charcoal/50 border border-white/5 hover:border-brand-green/30 transition-all duration-300"
                 >
-                  <img
+                  <Image
                     src={getImageUrl(image.file_path)}
                     alt={image.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    onError={() => {
+                    fill
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+                    onClick={() => setSelectedImage(image)}
+                    onError={(e) => {
                       console.error('Erreur chargement image:', getImageUrl(image.file_path));
+                      e.currentTarget.src = '/gallery-placeholder.webp';
+                      e.currentTarget.onerror = null;
+                    }}
+                    onLoad={() => {
+                      console.log('Image récente chargée:', getImageUrl(image.file_path));
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-2">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setSelectedImage(image)}
+                        className="p-2 bg-brand-green/80 rounded-full hover:bg-brand-green transition-colors shadow-lg"
+                        title="Voir en grand"
+                      >
+                        <FaExpand className="text-white text-sm" />
+                      </button>
+                      <button
+                        onClick={() => handleDownload(getImageUrl(image.file_path), image.title)}
+                        className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors shadow-lg"
+                        title="Télécharger"
+                      >
+                        <FaDownload className="text-white text-sm" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -151,16 +200,22 @@ export default function GalleryPage() {
                 >
                   <div className="relative aspect-video bg-brand-dark/50">
                     {album.cover_image ? (
-                      <img
+                      <Image
                         src={getImageUrl(album.cover_image || '')}
                         alt={album.name}
+                        fill
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={() => {
-                          console.error('Erreur chargement image:', getImageUrl(album.cover_image || ''));
+                        onError={(e) => {
+                          console.error('Erreur chargement image album:', getImageUrl(album.cover_image || ''));
+                          e.currentTarget.src = '/gallery-placeholder.webp';
+                          e.currentTarget.onerror = null;
+                        }}
+                        onLoad={() => {
+                          console.log('Image album chargée:', getImageUrl(album.cover_image || ''));
                         }}
                       />
                     ) : (
-                      <div className="flex items-center justify-center h-full">
+                      <div className="flex items-center justify-center h-full bg-brand-dark/50">
                         <FaImages className="text-4xl text-gray-400" />
                       </div>
                     )}
@@ -195,6 +250,14 @@ export default function GalleryPage() {
             </div>
           )}
         </section>
+        
+        {/* Lightbox */}
+        <ImageLightbox
+          images={recentImages}
+          selectedImage={selectedImage}
+          onClose={() => setSelectedImage(null)}
+          initialIndex={recentImages.findIndex(img => img.id === selectedImage?.id)}
+        />
       </div>
     </div>
   );

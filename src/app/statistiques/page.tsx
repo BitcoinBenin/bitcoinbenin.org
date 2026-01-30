@@ -58,10 +58,10 @@ export default function StatistiquesPage() {
           
           <div className="bg-black bg-opacity-30 rounded-xl p-6 text-center border border-gray-700 transform transition-all duration-500 hover:scale-105 hover:shadow-xl">
             <div className="flex justify-center">
-              <AnimatedCounter target={8} />
+              <AnimatedCounter target={4} />
             </div>
             <div className="text-lg animate-fade-in-up">Partenaires</div>
-            <div className="text-sm text-gray-400 mt-2 animate-fade-in-up-delay">Actifs et engagés</div>
+            <div className="text-sm text-gray-400 mt-2 animate-fade-in-up-delay">4 partenaires actifs</div>
           </div>
         </div>
 

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { supabaseAdmin } from '@/lib/supabase';
 import { GalleryImage } from '@/lib/supabase';
+import { uploadImage } from '../admin/actions';
 import Button from './ui/Button';
 
 interface ImageUploadProps {
@@ -10,7 +10,7 @@ interface ImageUploadProps {
   albumId?: string;
 }
 
-export default function ImageUpload({ onUploadComplete, albumId }: ImageUploadProps) {
+export default function ImageUploadWithActions({ onUploadComplete, albumId }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
@@ -20,9 +20,10 @@ export default function ImageUpload({ onUploadComplete, albumId }: ImageUploadPr
   };
 
   const uploadImages = async () => {
-    if (!selectedFiles || selectedFiles.length === 0) return;
-    if (!supabaseAdmin) {
-      console.error('Supabase admin n\'est pas configuré');
+    console.log('Début uploadImages - fichiers sélectionnés:', selectedFiles?.length);
+    
+    if (!selectedFiles || selectedFiles.length === 0) {
+      console.log('Aucun fichier sélectionné');
       return;
     }
 
@@ -34,49 +35,25 @@ export default function ImageUpload({ onUploadComplete, albumId }: ImageUploadPr
 
       for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
-        const filePath = `gallery/${fileName}`;
-
-        // Upload du fichier
-        const { error: uploadError } = await supabaseAdmin.storage
-          .from('gallery')
-          .upload(filePath, file);
-
-        if (uploadError) {
-          console.error('Erreur upload:', uploadError);
+        console.log(`Traitement fichier ${i + 1}/${selectedFiles.length}:`, file.name);
+        
+        try {
+          console.log('Appel de uploadImage pour:', file.name);
+          const imageData = await uploadImage(file, albumId);
+          console.log('uploadImage réussi pour:', file.name);
+          uploadedImages.push(imageData);
+        } catch (error: unknown) {
+          console.error('Erreur upload fichier:', file.name, error);
+          console.error('Type d\'erreur:', (error as Error)?.constructor?.name);
+          console.error('Message d\'erreur:', (error as Error)?.message);
+          console.error('Stack complet:', (error as Error)?.stack);
           continue;
         }
 
-        // Récupération de l'URL publique
-        supabaseAdmin.storage
-          .from('gallery')
-          .getPublicUrl(filePath);
-
-        // Insertion dans la base de données
-        const { data: imageData, error: insertError } = await supabaseAdmin
-          .from('gallery_images')
-          .insert({
-            title: file.name,
-            file_path: filePath,
-            file_size: file.size,
-            content_type: file.type,
-            album_id: albumId,
-            event_date: new Date().toISOString().split('T')[0], // Date du jour
-            tags: ['bitcoin-benin', 'event']
-          })
-          .select()
-          .single();
-
-        if (insertError) {
-          console.error('Erreur insertion:', insertError);
-          continue;
-        }
-
-        uploadedImages.push(imageData);
         setProgress(Math.round(((i + 1) / selectedFiles.length) * 100));
       }
 
+      console.log('Upload terminé. Images uploadées:', uploadedImages.length);
       onUploadComplete?.(uploadedImages);
       setSelectedFiles(null);
       
@@ -84,8 +61,10 @@ export default function ImageUpload({ onUploadComplete, albumId }: ImageUploadPr
       const fileInput = document.getElementById('file-upload') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
 
-    } catch (error) {
-      console.error('Erreur lors de l\'upload:', error);
+    } catch (error: unknown) {
+      console.error('Erreur générale lors de l\'upload:', error);
+      console.error('Type d\'erreur générale:', (error as Error)?.constructor?.name);
+      console.error('Message d\'erreur générale:', (error as Error)?.message);
     } finally {
       setUploading(false);
       setProgress(0);
