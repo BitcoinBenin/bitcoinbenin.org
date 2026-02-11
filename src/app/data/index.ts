@@ -28,8 +28,8 @@ export const MISSIONS = [
 // Partners Data
 export const PARTNERS = [
   
-   { name: 'izichange', logo: '/partners/Flash Logo.png' },
-   { name: 'BMM', logo: '/partners/Logo BMM.png' },
+   { name: 'izichange', logo: '/partners/Flash%20Logo.png' },
+   { name: 'BMM', logo: '/partners/Logo%20BMM.png' },
    { name: 'planb Network', logo: '/partners/planb-network.png' },
    { name: 'Trezor', logo: '/partners/TrezorAcademy.png' },
   

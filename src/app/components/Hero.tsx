@@ -1,9 +1,14 @@
-import WaveTransition from './WaveTransition';
+'use client';
+
+import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Button from './ui/Button';
+import { AnimatedWrapper } from './Animations';
+import WaveTransition from './WaveTransition';
 
 export default function Hero() {
   return (
-    <section className="relative text-white pt-32 pb-48 md:pt-40 md:pb-56 flex items-center justify-center">
+    <section className="relative min-h-screen text-white flex items-center justify-center overflow-hidden">
       {/* Background image optimisée */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -16,38 +21,86 @@ export default function Hero() {
         />
       </div>
       
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-hero-gradient-dark opacity-90 z-10"></div>
+      {/* Overlay avec gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/95 via-black/85 to-black/75 z-10"></div>
 
-      <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
-        {/* Text and Buttons */}
-        <div className="flex flex-col gap-8 items-center justify-center w-full">
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tighter animate-fade-in-up text-center w-full">
-            Rejoignez la communauté Bitcoin Béninoise
+      <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-20">
+        <AnimatedWrapper
+          variants={{
+            hidden: { opacity: 0, y: 30 },
+            visible: { opacity: 1, y: 0 }
+          }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          {/* Titre principal */}
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
+            <span className="block text-white mb-2">Bitcoin, pour tous au Bénin</span>
+            <span className="block bg-gradient-to-r from-brand-green to-brand-accent bg-clip-text text-transparent">
+              Bénin
+            </span>
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto text-center animate-fade-in-up delay-100 w-full">
-            Découvrez, apprenez et développez l&apos;écosystème{' '}
-            <span className="text-orange-bitcoin font-semibold">Bitcoin</span> au Bénin.
+
+          {/* Sous-titre */}
+          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed">
+            Rejoignez une communauté active qui transforme l’éducation, l’innovation et l’adoption 
+            <span className="text-brand-green font-semibold"> Bitcoin</span> 
+            {' '} dans tout le pays.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 mt-4 justify-center animate-fade-in-up delay-200 w-full">
+
+          {/* Boutons d'action */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <a
               href="https://x.com/bitcoinbenin"
-              className="btn-primary-orange text-white font-bold py-4 px-8 rounded-lg text-lg hover:shadow-orange-glow transition-all duration-300 transform hover:scale-105 animate-pulse-green mx-2"
+              className="inline-flex items-center justify-center bg-gradient-to-r from-brand-green to-brand-accent hover:from-brand-green-dark hover:to-brand-green text-white font-semibold px-9 py-4 rounded-lg shadow-lg hover:shadow-glow transform hover:scale-105 transition-all duration-300 text-base"
             >
-              Rejoindre la communauté
+              <span className="flex items-center gap-2">
+                Rejoindre la communauté
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </span>
             </a>
+            
             <a
               href="/nous-soutenir"
-              className="btn-secondary-outline text-white font-bold py-4 px-8 rounded-lg text-lg transform hover:scale-105 transition-all duration-300 mx-2"
+              className="inline-flex items-center justify-center border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm font-semibold px-9 py-4 rounded-lg transform hover:scale-105 transition-all duration-300 text-base"
             >
               Nous soutenir
             </a>
           </div>
-        </div>
-      </div>
 
-      {/* Wave Transition to next section */}
-      <WaveTransition />
+          {/* Stats ou indicateurs sociaux */}
+          <div className="grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-center"
+            >
+              <div className="text-3xl font-bold text-brand-green mb-2">1000+</div>
+              <div className="text-sm text-gray-400">Membres</div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-center"
+            >
+              <div className="text-3xl font-bold text-brand-green mb-2">50+</div>
+              <div className="text-sm text-gray-400">Événements</div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="text-center"
+            >
+              <div className="text-3xl font-bold text-brand-green mb-2">12</div>
+              <div className="text-sm text-gray-400">Villes</div>
+            </motion.div>
+          </div>
+        </AnimatedWrapper>
+      </div>
     </section>
   );
 }
