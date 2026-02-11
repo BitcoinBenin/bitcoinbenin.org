@@ -5,11 +5,11 @@ import AutresRessourcesUtiles from "../components/AutreRessourceUtile";
 
 export default function NosRessourcesPage() {
   return (
-    <main className="bg-hero-gradient-dark text-white min-h-screen">
-    <NosRessources />
-    <RessourcesCommunaute />
-    <Incontournables />
-    <AutresRessourcesUtiles />
+    <main className="min-h-screen pt-24 md:pt-28">
+      <NosRessources />
+      <RessourcesCommunaute />
+      <Incontournables />
+      <AutresRessourcesUtiles />
     </main>
   );
 }

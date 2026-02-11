@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb', // Augmenter la limite à 10MB
+    },
+  },
   images: {
     remotePatterns: [
       {
@@ -14,6 +19,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'placehold.co' },
       { protocol: 'https', hostname: 'drive.google.com' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+      { protocol: 'https', hostname: 'hgnwadiljauqbhsbtxkk.supabase.co' },
     ],
     // Optimiser le format des images
     formats: ['image/avif', 'image/webp'],

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function CommunautePage() {
   return (
-    <main className="bg-hero-gradient-dark text-white min-h-screen">
+    <main className="min-h-screen pt-20">
       <Communaute />
       <Communautesection />
       <Communautesection1 />

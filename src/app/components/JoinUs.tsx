@@ -1,96 +1,192 @@
 'use client';
 
 import Image from 'next/image';
-import InvertedWave from './InvertedWave';
-import { motion, easeOut } from 'framer-motion';
+import Button from './ui/Button';
+import { motion } from 'framer-motion';
+import { AnimatedWrapper, HoverAnimation, useParallax } from './Animations';
 
 export default function JoinUs() {
+  const { ref: parallaxRef, y } = useParallax(0.3);
 
-  const sectionVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        ease: easeOut,
-        when: "beforeChildren",
-        staggerChildren: 0.3,
-      },
-    },
-  };
-
-  const slideInLeft = {
-    hidden: { opacity: 0, x: -100 },
-    show: { opacity: 1, x: 0, transition: { duration: 0.8, ease: easeOut } },
-  };
-
-  const slideInRight = {
-    hidden: { opacity: 0, x: 100 },
-    show: { opacity: 1, x: 0, transition: { duration: 0.8, ease: easeOut } },
+  const buttonVariants = {
+    initial: { scale: 1 },
+    hover: { scale: 1.05, transition: { duration: 0.2 } },
+    tap: { scale: 0.95 }
   };
 
   return (
-    <motion.section 
-      className="relative bg-[#0D1117] text-white py-32 sm:py-48"
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.3 }}
-      variants={sectionVariants}
-    >
-      <InvertedWave />
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-        
-        {/* Left Column: Text and Buttons */}
-        <motion.div 
-          className="flex flex-col gap-8 text-center md:text-left"
-          variants={slideInLeft}
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-green-500 text-glow-green">
-            Discutez, partagez, explorez
-          </h2>
-          <p className="text-lg leading-relaxed text-gray-300">
-            Rejoignez notre communauté pour échanger, apprendre et construire ensemble. Sur
-            Telegram, Discord, Twitter ou lors de nos meetups, vous trouverez des passionnés
-            prêts à partager leurs expériences et leurs projets.
-          </p>
-          <p className="text-base text-gray-400 mt-2">
-            De nombreuses ressources sont disponibles sur notre site. Prenez le temps d&apos;y
-            faire un tour, et partagez vos trouvailles lors d&apos;un prochain événement !
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 mt-6 justify-center md:justify-start">
-            <a
-              href="#"
-              className="btn-primary-green text-white font-bold py-4 px-8 rounded-xl text-lg transform hover:scale-105 transition-all duration-300"
-            >
-              Nous rejoindre
-            </a>
-            <a
-              href="#"
-              className="btn-secondary-green-outline font-bold py-4 px-8 rounded-xl text-lg transform hover:scale-105 transition-all duration-300"
-            >
-              Nos ressources
-            </a>
-          </div>
-        </motion.div>
+    <section className="py-24 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
 
-        {/* Right Column: Image */}
-        <motion.div 
-          className="relative group"
-          variants={slideInRight}
-        >
-          <div className="absolute -inset-0.5 bg-gradient-to-tr from-green-900/40 to-transparent rounded-2xl blur-lg group-hover:blur-xl transition-all duration-500 opacity-70 group-hover:opacity-100"></div>
-          <div className="relative rounded-2xl shadow-2xl overflow-hidden">
-            <Image
-              src="/missions.png"
-              alt="Rejoignez la communauté Bitcoin Benin"
-              width={800}
-              height={600}
-              className="filter grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-            />
-          </div>
-        </motion.div>
+          <AnimatedWrapper
+            variants={{
+              hidden: { opacity: 0, x: -50 },
+              visible: { opacity: 1, x: 0 }
+            }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <motion.div>
+              <motion.span 
+                className="text-brand-orange font-semibold tracking-wide uppercase text-sm mb-2 block inline-block"
+                whileHover={{ scale: 1.1, color: "#ff6b35" }}
+                transition={{ type: "spring", stiffness: 400 }}
+              >
+                Communauté
+              </motion.span>
+              
+              <motion.h2 
+                className="text-4xl md:text-5xl font-bold text-white leading-tight mb-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+              >
+                Discutez, Partagez, <br />
+                <motion.span 
+                  className="text-brand-orange drop-shadow-lg inline-block"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  Explorez
+                </motion.span>
+              </motion.h2>
 
+              <motion.p 
+                className="text-lg text-gray-400 mb-8 leading-relaxed"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+              >
+                Rejoignez notre réseau décentralisé.
+                Retrouvez-nous sur 
+                <motion.span 
+                  className="font-semibold text-white mx-1 inline-block"
+                  whileHover={{ scale: 1.1, color: "#ff6b35" }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  Telegram
+                </motion.span>
+                ,
+                <motion.span 
+                  className="font-semibold text-white mx-1 inline-block"
+                  whileHover={{ scale: 1.1, color: "#ff6b35" }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  Whatsapp
+                </motion.span>
+                , ou
+                <motion.span 
+                  className="font-semibold text-white mx-1 inline-block"
+                  whileHover={{ scale: 1.1, color: "#ff6b35" }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  Twitter
+                </motion.span>
+                .
+              </motion.p>
+
+              <motion.div 
+                className="flex flex-wrap gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+              >
+                <motion.div variants={buttonVariants} initial="initial" whileHover="hover" whileTap="tap">
+                  <Button 
+                    variant="primary" 
+                    size="lg" 
+                    onClick={() => window.open('https://t.me/+vUzohmB0EFMzZTI8', '_blank')}
+                    className="relative overflow-hidden group"
+                  >
+                    <motion.span
+                      className="relative z-10"
+                      whileHover={{ x: 2 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      Rejoindre Telegram
+                    </motion.span>
+                    <motion.div
+                      className="absolute inset-0 bg-white/20"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: "100%" }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </Button>
+                </motion.div>
+
+                <motion.div variants={buttonVariants} initial="initial" whileHover="hover" whileTap="tap">
+                  <Button 
+                    variant="secondary" 
+                    size="lg" 
+                    onClick={() => window.open('https://chat.whatsapp.com/BVAQ7yk3fLY6zdOQvJM2zu', '_blank')}
+                    className="relative overflow-hidden group"
+                  >
+                    <motion.span
+                      className="relative z-10"
+                      whileHover={{ x: 2 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      Rejoindre Whatsapp
+                    </motion.span>
+                    <motion.div
+                      className="absolute inset-0 bg-white/10"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: "100%" }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </Button>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          </AnimatedWrapper>
+
+          <AnimatedWrapper
+            variants={{
+              hidden: { opacity: 0, x: 50 },
+              visible: { opacity: 1, x: 0 }
+            }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <motion.div ref={parallaxRef} style={{ y }} className="relative">
+              <HoverAnimation hoverScale={1.02} hoverY={-5}>
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 group">
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-brand-orange/20 to-brand-green/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 1 }}
+                  />
+                  <Image
+                    src="/communaute.jpg"
+                    alt="Communauté Bitcoin Bénin"
+                    width={600}
+                    height={600}
+                    className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100"
+                  />
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-t from-brand-dark to-transparent pointer-events-none"
+                    initial={{ opacity: 0.7 }}
+                    whileHover={{ opacity: 0.5 }}
+                  />
+                </div>
+              </HoverAnimation>
+              
+              {/* Glow behind image */}
+              <motion.div 
+                className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-brand-orange/20 blur-[80px] rounded-full"
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  opacity: [0.5, 0.8, 0.5]
+                }}
+                transition={{ 
+                  duration: 4, 
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+            </motion.div>
+          </AnimatedWrapper>
+        </div>
       </div>
-    </motion.section>
+    </section>
   );
 }

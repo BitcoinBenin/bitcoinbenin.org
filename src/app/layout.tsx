@@ -1,44 +1,36 @@
 import type { Metadata } from "next";
-// import { Inter } from "next/font/google"; // Désactivé en cas de problème de connexion
-import TopBanner from "./components/TopBanner";
+import { Inter } from "next/font/google";
+import localFont from 'next/font/local';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AccessibilityPreferences from "./components/AccessibilityPreferences";
 import "./globals.css";
 
-// Utilisation d'une font système en attendant
-const interFont = {
-  className: 'font-sans',
-};
+const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
+const orbitron = localFont({ 
+  src: [
+    { path: '../fonts/Orbitron-VariableFont_wght.ttf', weight: '400' },
+    { path: '../fonts/Orbitron-Bold.ttf', weight: '700' }
+  ],
+  variable: '--font-orbitron',
+  display: 'swap'
+});
+const jetbrainsMono = localFont({ 
+  src: [
+    { path: '../fonts/JetBrainsMono-Regular.ttf', weight: '400' },
+    { path: '../fonts/JetBrainsMono-Bold.ttf', weight: '700' }
+  ],
+  variable: '--font-jetbrains-mono',
+  display: 'swap'
+});
 
 export const metadata: Metadata = {
   title: {
     default: "Bitcoin Bénin - Communauté Bitcoin au Bénin",
     template: "%s | Bitcoin Bénin"
   },
-  description: "Site officiel Bitcoin Bénin - Découvrez, apprenez et développez l'écosystème Bitcoin au Bénin. Rejoignez notre communauté pour des événements, des ressources éducatives et des opportunités commerciales.",
+  description: "Site officiel Bitcoin Bénin - Découvrez, apprenez et développez l'écosystème Bitcoin au Bénin.",
   keywords: ["Bitcoin", "Bénin", "cryptomonnaie", "communauté", "éducation", "événement", "adoption"],
-  authors: [{ name: "Bitcoin Bénin" }],
-  creator: "Bitcoin Bénin",
-  publisher: "Bitcoin Bénin",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  openGraph: {
-    type: "website",
-    locale: "fr_FR",
-    url: "https://bitcoinbenin.org",
-    title: "Bitcoin Bénin - Communauté Bitcoin au Bénin",
-    description: "Site officiel Bitcoin Bénin - Découvrez, apprenez et développez l'écosystème Bitcoin au Bénin. Rejoignez notre communauté pour des événements, des ressources éducatives et des opportunités commerciales.",
-    siteName: "Bitcoin Bénin",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Bitcoin Bénin - Communauté Bitcoin au Bénin",
-    description: "Site officiel Bitcoin Bénin - Découvrez, apprenez et développez l'écosystème Bitcoin au Bénin.",
-  },
 };
 
 export default function RootLayout({
@@ -47,13 +39,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
-      <body className={`${interFont.className} bg-gray-900 text-white antialiased`}>
+    <html lang="fr" className="scroll-smooth">
+      <body className={`${inter.variable} ${orbitron.variable} ${jetbrainsMono.variable} font-sans bg-brand-dark text-gray-300 antialiased selection:bg-brand-green selection:text-white overflow-x-hidden`}>
+        {/* Simple Background */}
+        <div className="fixed inset-0 z-[-1] bg-premium-gradient"></div>
+        <div className="fixed top-0 left-0 w-full h-[500px] bg-brand-green/5 blur-[120px] rounded-full translate-y-[-50%] pointer-events-none opacity-40"></div>
+
+        <div className="relative flex min-h-screen flex-col">
+          {/* <TopBanner />  Preserve if needed, but maybe hide for "Pure Tech" look? keeping for now */}
+          {/* TopBanner moved to Header */}
+          <Header />
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
+        </div>
         <AccessibilityPreferences />
-        <TopBanner />
-        <Header />
-        <main id="main-content">{children}</main>
-        <Footer />
       </body>
     </html>
   );

@@ -1,4 +1,4 @@
-import { FaRegCalendarAlt, FaBitcoin, FaShoppingCart, FaTelegramPlane, FaTwitter, FaEnvelope, FaCalendarAlt, FaMapMarkerAlt, FaArrowRight, FaLinkedin, FaFacebook } from 'react-icons/fa';
+import { FaRegCalendarAlt, FaBitcoin, FaShoppingCart, FaTelegramPlane, FaTwitter, FaEnvelope, FaLinkedin, FaFacebook } from 'react-icons/fa';
 
 // Mission Data
 export const MISSIONS = [
@@ -27,8 +27,12 @@ export const MISSIONS = [
 
 // Partners Data
 export const PARTNERS = [
-  { name: 'Trezor', logo: '/partners/trezor.svg' },
-  { name: 'Plan ₿ Network', logo: '/partners/planb-network.png' },
+  
+   { name: 'izichange', logo: '/partners/Flash Logo.png' },
+   { name: 'BMM', logo: '/partners/Logo BMM.png' },
+   { name: 'planb Network', logo: '/partners/planb-network.png' },
+   { name: 'Trezor', logo: '/partners/TrezorAcademy.png' },
+  
 ];
 
 // Navigation Links Data
@@ -37,56 +41,35 @@ export const NAV_LINKS = [
   { name: ' Evènements', href: '/events' },
   { name: ' Soutenir', href: '/nous-soutenir' },
   { name: ' Ressources', href: '/NosRessources' },
-  { name: ' Galerie', href: '/galerie' },
+  { name: ' Galerie', href: '/gallery' },
   { name: 'Accepter Bitcoin', href: '/accepter-bitcoin' },
 ];
 
 // Social Links Data
 export const SOCIAL_LINKS = [
-  { icon: FaTelegramPlane, href: 'https://t.me/+vUzohmB0EFMzZTI8' },
-  { icon: FaTwitter, href: 'https://x.com/BitcoinBenin' },
-  { icon: FaEnvelope, href: ' bitcoinbenin@gmail.com' },
-  { icon: FaLinkedin, href: 'https://www.linkedin.com/company/bitcoinbenin/' },
-  { icon: FaFacebook, href: 'https://www.facebook.com/BitcoinBenin' },
+  { name: 'Telegram', icon: FaTelegramPlane, href: 'https://t.me/+vUzohmB0EFMzZTI8' },
+  { name: 'Twitter', icon: FaTwitter, href: 'https://x.com/BitcoinBenin' },
+  { name: 'Email', icon: FaEnvelope, href: 'mailto:benedoffice@gmail.com' }, // Fixed mailto protocol while at it
+  { name: 'LinkedIn', icon: FaLinkedin, href: 'https://www.linkedin.com/company/bitcoinbenin/' },
+  { name: 'Facebook', icon: FaFacebook, href: 'https://www.facebook.com/BitcoinBenin' },
 ];
 
 // Events Data
 export const EVENTS = [
   {
-    id: 1,
-    title: 'Meetup Bitcoin mensuel',
-    date: '15 Novembre 2025',
-    time: '16h00 - 18h00',
-    startDate: null,
-    endDate: null,
-    location: 'SOROC, Ancienne boulangerie Zogbo',
-    locationLink: 'https://maps.app.goo.gl/Hie2sSxvGPipLNFu5?g_st=ac',
-    description: "Ce samedi 15 novembre, Bitcoin Bénin invite tous les commerçants, chefs d’entreprise et particuliers à un meetup exclusif pour apprendre : comment intégrer le Bitcoin à ton activité, quelles solutions existent déjà au Bénin, et comment le faire sans risque, étape par étape.",
-    image: '/event.webp',
-    posterImage: '/event1.jpg',
-    link: '/events/1',
-    registrationLink: 'https://clooza.com/events/MEETUPNOVEMBRE',
-    iconCalendar: FaCalendarAlt,
-    iconLocation: FaMapMarkerAlt,
-    iconArrowRight: FaArrowRight,
+    id: '1',
+    title: 'Premier événement Bitcoin Bénin',
+    date: '2024-01-03',
+    location: 'Cotonou, Bénin',
+    description: 'Rejoignez-nous pour découvrir les bases de Bitcoin lors de notre premier événement mensuel gratuit.',
+    imageUrl: '/images/event-placeholder.jpg',
   },
-  
   {
-    id: 4,
-    title: 'Atelier Lightning Network (Passé)',
-    date: '20 Octobre 2024',
-    time: '10h00 - 13h00',
-    startDate: '2024-10-20T10:00:00',
-    endDate: '2024-10-20T13:00:00',
-    location: 'Online',
-    locationLink: '#',
-    description: "Un atelier technique pour apprendre à utiliser le Lightning Network pour des paiements Bitcoin rapides et à faible coût.",
-    image: '/event.webp',
-    posterImage: '/event1.jpg',
-    link: '/events/4',
-    registrationLink: '#',
-    iconCalendar: FaCalendarAlt,
-    iconLocation: FaMapMarkerAlt,
-    iconArrowRight: FaArrowRight,
+    id: '2',
+    title: 'Atelier Bitcoin avancé',
+    date: '2024-02-07',
+    location: 'Porto-Novo, Bénin',
+    description: 'Un atelier pour approfondir vos connaissances sur le stockage et la sécurité Bitcoin.',
+    imageUrl: '/images/event-placeholder.jpg',
   },
 ];
