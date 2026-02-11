@@ -14,11 +14,6 @@ export default function Partners() {
     show: { transition: { staggerChildren: 0.1 } },
   };
 
-  const titleVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: easeOut } },
-  };
-
   const logoGridVariants = {
     hidden: {},
     show: { transition: { staggerChildren: 0.1 } },
@@ -60,8 +55,8 @@ export default function Partners() {
               Nos partenaires & <span className="text-brand-green">soutiens</span>
             </h2>
             <p className="mt-6 text-lg leading-8 text-gray-300 text-center w-full max-w-3xl mx-auto">
-              Nous collaborons avec des acteurs de l'écosystème Bitcoin, des universités et
-              des communautés locales pour promouvoir l'adoption du Bitcoin au Bénin.
+              Nous collaborons avec des acteurs de l&apos;écosystème Bitcoin, des universités et
+              des communautés locales pour promouvoir l&apos;adoption du Bitcoin au Bénin.
             </p>
           </div>
         </AnimatedWrapper>
