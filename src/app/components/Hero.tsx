@@ -32,7 +32,7 @@ export default function Hero() {
         >
           {/* Titre principal */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-            <span className="block text-white mb-2">Bitcoin, pour tous au Bénin</span>
+            <span className="block text-white mb-2">Communauté Bitcoin </span>
             <span className="block bg-gradient-to-r from-brand-green to-brand-accent bg-clip-text text-transparent">
               Bénin
             </span>
