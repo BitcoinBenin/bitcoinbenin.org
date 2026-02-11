@@ -1,11 +1,13 @@
 'use client';
 
 import { PARTNERS } from '../data';
-import { motion, easeOut } from 'framer-motion';
+import { motion, easeOut, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
+import { AnimatedWrapper } from './Animations';
 
 export default function Partners() {
   const partners = PARTNERS;
+  const prefersReducedMotion = useReducedMotion();
 
   const sectionVariants = {
     hidden: {},
@@ -29,59 +31,94 @@ export default function Partners() {
 
   return (
     <motion.section 
-      className="bg-gradient-to-br from-[#F5F9F6] to-[#E8F5E9] py-24 sm:py-32"
+      className="bg-brand-dark py-24 sm:py-32 relative overflow-hidden"
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, amount: 0.2 }}
       variants={sectionVariants}
     >
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <motion.div 
-          className="mx-auto max-w-2xl text-center w-full"
-          variants={titleVariants}
+      {/* Background pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-dark via-brand-charcoal to-brand-dark opacity-50"></div>
+      
+      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+        <AnimatedWrapper
+          variants={{
+            hidden: { opacity: 0, y: 30 },
+            visible: { opacity: 1, y: 0 }
+          }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <h2 className="text-4xl font-bold tracking-tight text-[#0A0F0C] sm:text-5xl text-center w-full mb-4">
-            Nos partenaires & soutiens
-          </h2>
-          <p className="mt-6 text-lg leading-8 text-gray-600 text-center w-full max-w-3xl mx-auto">
-            Nous collaborons avec des acteurs de l’écosystème Bitcoin, des universités et
-            des communautés locales pour promouvoir l’adoption du Bitcoin au Bénin.
-          </p>
-        </motion.div>
-        <motion.div 
-          className="mx-auto mt-16 flex flex-wrap justify-center items-center gap-12"
-          variants={logoGridVariants}
-        >
-          {partners.map((partner) => (
-            <motion.div
-              key={partner.name}
-              className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110 w-40"
-              variants={logoVariants}
+          <div className="mx-auto max-w-4xl text-center w-full">
+            <motion.span 
+              className="text-brand-green font-semibold tracking-wide uppercase text-sm mb-4 block inline-block"
+              whileHover={{ scale: 1.05 }}
+              transition={{ stiffness: 400 }}
             >
-              <div className="flex items-center justify-center w-full h-20">
-                <Image 
-                  src={partner.logo} 
-                  alt={`${partner.name} logo`}
-                  width={140}
-                  height={80}
-                  className="object-contain w-auto h-auto max-w-full max-h-full"
-                />
-              </div>
-              <p className="text-base font-semibold text-gray-800 mt-3 text-center">{partner.name}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-        <motion.div 
-          className="mt-20 text-center w-full"
-          variants={titleVariants}
-        >
-          <a
-            href="#"
-            className="btn-primary-green text-white font-bold py-4 px-8 rounded-xl text-lg transform hover:scale-105 transition-all duration-300 inline-block mx-auto shadow-lg hover:shadow-xl"
+              Partenariats
+            </motion.span>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white sm:text-5xl text-center w-full mb-6">
+              Nos partenaires & <span className="text-brand-green">soutiens</span>
+            </h2>
+            <p className="mt-6 text-lg leading-8 text-gray-300 text-center w-full max-w-3xl mx-auto">
+              Nous collaborons avec des acteurs de l'écosystème Bitcoin, des universités et
+              des communautés locales pour promouvoir l'adoption du Bitcoin au Bénin.
+            </p>
+          </div>
+        </AnimatedWrapper>
+
+        <div className="mx-auto mt-20 w-full overflow-hidden">
+          <motion.div
+            className="flex w-max gap-8"
+            variants={logoGridVariants}
+            animate={prefersReducedMotion ? undefined : { x: ['0%', '-50%'] }}
+            transition={
+              prefersReducedMotion
+                ? undefined
+                : { duration: 25, ease: 'linear', repeat: Infinity }
+            }
           >
-            Devenir partenaire
-          </a>
-        </motion.div>
+            {[...partners, ...partners].map((partner, idx) => (
+              <motion.div
+                key={`${partner.name}-${idx}`}
+                className="flex items-center justify-center p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/10 hover:border-brand-green/30 transition-all duration-500 transform hover:scale-105 group shrink-0"
+                variants={logoVariants}
+                whileHover={{ y: -5 }}
+              >
+                <div className="flex items-center justify-center w-44 h-20 bg-white/90 rounded-xl px-4 py-3">
+                  <Image 
+                    src={partner.logo} 
+                    alt={`${partner.name} logo`}
+                    width={140}
+                    height={80}
+                    className="object-contain w-auto h-auto max-w-full max-h-full"
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+
+        <AnimatedWrapper
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: { opacity: 1, y: 0 }
+          }}
+          transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+        >
+          <div className="mt-20 text-center w-full">
+            <a
+              href="/contact"
+              className="inline-flex items-center justify-center bg-gradient-to-r from-brand-green to-brand-accent hover:from-brand-green-dark hover:to-brand-green text-white font-semibold px-9 py-4 rounded-lg shadow-lg hover:shadow-glow transform hover:scale-105 transition-all duration-300 text-base"
+            >
+              <span className="flex items-center gap-2">
+                Devenir partenaire
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </span>
+            </a>
+          </div>
+        </AnimatedWrapper>
       </div>
     </motion.section>
   );

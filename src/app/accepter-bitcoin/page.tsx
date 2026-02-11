@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function AcceptBitcoinPage() {
   return (
-    <div className="bg-hero-gradient-dark text-gray-300 py-20 sm:py-32 pt-32">
+    <div className="bg-hero-gradient-dark text-gray-300 py-20 sm:py-32 pt-40 sm:pt-44">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <AcceptBitcoinHero />
 
