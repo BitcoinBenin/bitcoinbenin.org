@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
     ],
     // Optimiser le format des images
     formats: ['image/avif', 'image/webp'],
+    qualities: [75, 85],
   },
   // Optimisations de performance
   compiler: {
