@@ -13,9 +13,12 @@ export default function Hero() {
           src="/hero.png"
           alt="Hero background"
           fill
+          sizes="100vw"
           style={{ objectFit: 'cover', objectPosition: 'center' }}
           priority
-          quality={85}
+          quality={60}
+          placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8A8A"
         />
       </div>
       
@@ -32,7 +35,7 @@ export default function Hero() {
         >
           {/* Titre principal */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-            <span className="block text-white mb-2">Bitcoin, pour tous au Bénin</span>
+            <span className="block text-white mb-2">Communauté Bitcoin </span>
             <span className="block bg-gradient-to-r from-brand-green to-brand-accent bg-clip-text text-transparent">
               Bénin
             </span>
@@ -40,7 +43,7 @@ export default function Hero() {
 
           {/* Sous-titre */}
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed">
-            Rejoignez une communauté active qui transforme l’éducation, l’innovation et l’adoption 
+            Rejoignez une communauté active qui transforme l&apos;éducation, l&apos;innovation et l&apos;adoption 
             <span className="text-brand-green font-semibold"> Bitcoin</span> 
             {' '} dans tout le pays.
           </p>

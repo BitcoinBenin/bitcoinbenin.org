@@ -177,6 +177,7 @@ export default function TopBanner() {
       <button
         onClick={() => setIsVisible(false)}
         className="absolute -top-1 -right-1 p-1 rounded-full bg-brand-dark/90 border border-white/10 text-gray-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+        aria-label="Fermer la bannière"
       >
         <FaTimes className="text-xs" />
       </button>
@@ -193,6 +194,8 @@ export default function TopBanner() {
                   ? 'bg-brand-green w-3' 
                   : 'bg-white/30 hover:bg-white/50'
               }`}
+              aria-label={`Aller au message ${index + 1}`}
+              aria-current={index === currentMessage ? 'true' : 'false'}
             />
           ))}
         </div>

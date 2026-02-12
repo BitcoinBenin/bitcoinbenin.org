@@ -49,7 +49,7 @@ export default function Testimonials() {
                     {t.name[0]}
                   </div>
                   <div>
-                    <h4 className="font-display font-bold text-white text-sm">{t.name}</h4>
+                    <h3 className="font-display font-bold text-white text-sm">{t.name}</h3>
                     <p className="text-xs font-medium text-brand-green">{t.role}</p>
                   </div>
                 </div>

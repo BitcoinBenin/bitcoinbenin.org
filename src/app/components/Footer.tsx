@@ -37,7 +37,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={link.name}
-                  className="text-gray-500 hover:text-brand-orange transition-colors"
+                  className="text-gray-400 hover:text-brand-orange transition-colors"
                 >
                   <link.icon size={22} />
                 </a>
@@ -49,31 +49,31 @@ const Footer = () => {
           <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8 md:gap-12">
             {/* Column 1 */}
             <div className="flex flex-col gap-6">
-              <h4 className="text-white font-medium">Communauté</h4>
+              <h3 className="text-white font-medium">Communauté</h3>
               <ul className="flex flex-col gap-4">
-                <li><Link href="/communaute" className="text-sm text-gray-500 hover:text-brand-orange transition-colors">À propos</Link></li>
-                <li><Link href="/events" className="text-sm text-gray-500 hover:text-brand-orange transition-colors">Évènements</Link></li>
-                <li><a href="https://t.me/+vUzohmB0EFMzZTI8" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 hover:text-brand-orange transition-colors">Rejoindre</a></li>
+                <li><Link href="/communaute" className="text-sm text-gray-400 hover:text-brand-orange transition-colors">À propos</Link></li>
+                <li><Link href="/events" className="text-sm text-gray-400 hover:text-brand-orange transition-colors">Évènements</Link></li>
+                <li><a href="https://t.me/+vUzohmB0EFMzZTI8" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 hover:text-brand-orange transition-colors">Rejoindre</a></li>
               </ul>
             </div>
 
             {/* Column 2 */}
             <div className="flex flex-col gap-6">
-              <h4 className="text-white font-medium">Ressources</h4>
+              <h3 className="text-white font-medium">Ressources</h3>
               <ul className="flex flex-col gap-4">
-                <li><Link href="/NosRessources" className="text-sm text-gray-500 hover:text-brand-orange transition-colors">Comprendre Bitcoin</Link></li>
-                <li><Link href="/galerie" className="text-sm text-gray-500 hover:text-brand-orange transition-colors">Galerie Photos</Link></li>
-                <li><Link href="/accepter-bitcoin" className="text-sm text-gray-500 hover:text-brand-orange transition-colors">Business</Link></li>
+                <li><Link href="/NosRessources" className="text-sm text-gray-400 hover:text-brand-orange transition-colors">Comprendre Bitcoin</Link></li>
+                <li><Link href="/galerie" className="text-sm text-gray-400 hover:text-brand-orange transition-colors">Galerie Photos</Link></li>
+                <li><Link href="/accepter-bitcoin" className="text-sm text-gray-400 hover:text-brand-orange transition-colors">Business</Link></li>
               </ul>
             </div>
 
             {/* Column 3 */}
             <div className="flex flex-col gap-6">
-              <h4 className="text-white font-medium">Légal</h4>
+              <h3 className="text-white font-medium">Légal</h3>
               <ul className="flex flex-col gap-4">
-                <li><Link href="/nous-soutenir" className="text-sm text-gray-500 hover:text-brand-orange transition-colors">Faire un don</Link></li>
-                <li><Link href="/contact" className="text-sm text-gray-500 hover:text-brand-orange transition-colors">Contact</Link></li>
-                <li><span className="text-sm text-gray-600 cursor-not-allowed">Mentions Légales</span></li>
+                <li><Link href="/nous-soutenir" className="text-sm text-gray-400 hover:text-brand-orange transition-colors">Faire un don</Link></li>
+                <li><Link href="/contact" className="text-sm text-gray-400 hover:text-brand-orange transition-colors">Contact</Link></li>
+                <li><span className="text-sm text-gray-400 cursor-not-allowed">Mentions Légales</span></li>
               </ul>
             </div>
           </div>
@@ -81,14 +81,14 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="mt-20 pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-6">
-          <p className="text-gray-600 text-xs">
+          <p className="text-gray-400 text-xs">
             © {new Date().getFullYear()} Bitcoin Benin. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4">
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="flex items-center gap-2 text-xs text-gray-500 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-xs text-gray-400 hover:text-white transition-colors"
             >
               Retour en haut <FaArrowUp />
             </button>

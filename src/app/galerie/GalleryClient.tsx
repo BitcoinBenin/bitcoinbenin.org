@@ -161,7 +161,7 @@ export default function GalleryClient({ initialData }: { initialData: GalleryFol
                 alt={selectedImage.alt}
                 width={1200}
                 height={800}
-                sizes="100vw"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
                 style={{ objectFit: 'contain', width: '100%', height: 'auto' }}
                 className="rounded-lg max-h-[80vh] animate-fade-in"
                 priority
@@ -188,7 +188,7 @@ export default function GalleryClient({ initialData }: { initialData: GalleryFol
                     alt={nextImage.alt}
                     width={1200}
                     height={800}
-                    sizes="100vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
                     style={{ display: 'none' }}
                     priority
                   />
@@ -197,7 +197,7 @@ export default function GalleryClient({ initialData }: { initialData: GalleryFol
                     alt={prevImage.alt}
                     width={1200}
                     height={800}
-                    sizes="100vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
                     style={{ display: 'none' }}
                     priority
                   />

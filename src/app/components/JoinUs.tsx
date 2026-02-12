@@ -158,8 +158,8 @@ export default function JoinUs() {
                   <Image
                     src="/communaute.jpg"
                     alt="Communauté Bitcoin Bénin"
-                    width={600}
-                    height={600}
+                    width={362}
+                    height={241}
                     className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100"
                   />
                   <motion.div 
