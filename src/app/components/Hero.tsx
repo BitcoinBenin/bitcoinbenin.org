@@ -13,9 +13,10 @@ export default function Hero() {
           src="/hero.png"
           alt="Hero background"
           fill
+          sizes="100vw"
           style={{ objectFit: 'cover', objectPosition: 'center' }}
           priority
-          quality={85}
+          quality={75}
         />
       </div>
       

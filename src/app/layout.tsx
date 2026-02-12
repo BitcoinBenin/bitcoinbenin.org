@@ -6,9 +6,24 @@ import Footer from "./components/Footer";
 import AccessibilityPreferences from "./components/AccessibilityPreferences";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
-const orbitron = Orbitron({ subsets: ["latin"], variable: '--font-orbitron', display: 'swap' });
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: '--font-jetbrains-mono', display: 'swap' });
+const inter = Inter({ 
+  subsets: ["latin"], 
+  variable: '--font-inter',
+  display: 'swap',
+  preload: true
+});
+const orbitron = Orbitron({ 
+  subsets: ["latin"], 
+  variable: '--font-orbitron', 
+  display: 'swap',
+  preload: false
+});
+const jetbrainsMono = JetBrains_Mono({ 
+  subsets: ["latin"], 
+  variable: '--font-jetbrains-mono', 
+  display: 'swap',
+  preload: false
+});
 
 export const metadata: Metadata = {
   title: {
@@ -52,6 +67,30 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="scroll-smooth">
+      <head>
+        <link rel="preconnect" href="https://hgnwadiljauqbhsbtxkk.supabase.co" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            body{color:#f8fafc;background:#020617;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+            ::-webkit-scrollbar{width:8px}
+            ::-webkit-scrollbar-track{background:#020617}
+            ::-webkit-scrollbar-thumb{background:#334155;border-radius:4px}
+            ::-webkit-scrollbar-thumb:hover{background:#53CB60}
+            .text-xl{font-size:1.25rem;line-height:1.75rem}
+            .md\\:text-2xl{font-size:1.5rem;line-height:2rem}
+            .text-gray-300{color:#d1d5db}
+            .max-w-3xl{max-width:48rem}
+            .mx-auto{margin-left:auto;margin-right:auto}
+            .mb-12{margin-bottom:3rem}
+            .leading-relaxed{line-height:1.625}
+            .selection\\:bg-brand-green::selection{background-color:#53CB60}
+            .selection\\:text-white::selection{color:#ffffff}
+          `
+        }} />
+      </head>
       <body className={`${inter.variable} ${orbitron.variable} ${jetbrainsMono.variable} font-sans bg-brand-dark text-gray-300 antialiased selection:bg-brand-green selection:text-white overflow-x-hidden`}>
         <Script
           id="structured-data"

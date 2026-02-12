@@ -89,6 +89,8 @@ export default function Header() {
         <button
           className="md:hidden text-white p-2 hover:text-brand-green transition-colors pr-2"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-expanded={isMenuOpen}
         >
           {isMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
         </button>
