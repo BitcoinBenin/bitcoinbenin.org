@@ -75,6 +75,7 @@ const nextConfig: NextConfig = {
       splitChunks: {
         chunks: 'all',
         maxSize: 244000, // Limiter la taille des chunks CSS
+        minSize: 20000,
         cacheGroups: {
           vendor: {
             test: /[\\/]node_modules[\\/]/,
