@@ -8,9 +8,6 @@ const nextConfig: NextConfig = {
     },
   },
   // Cible navigateurs modernes pour réduire les polyfills
-  swcMinify: true,
-  // Désactiver la transpilation des features modernes
-  transpilePackages: [],
   images: {
     remotePatterns: [
       {
