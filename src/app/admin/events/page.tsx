@@ -437,40 +437,65 @@ export default function AdminEventsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                value={eventForm.title}
-                onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
-                className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Titre de l&apos;événement
+                </label>
+                <input
+                  type="text"
+                  value={eventForm.title}
+                  onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
+                  className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green"
+                />
+              </div>
 
-              <input
-                type="date"
-                value={eventForm.date}
-                onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
-                className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  value={eventForm.date}
+                  onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
+                  className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green"
+                />
+              </div>
 
-              <input
-                type="text"
-                value={eventForm.time}
-                onChange={(e) => setEventForm({ ...eventForm, time: e.target.value })}
-                className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Heure
+                </label>
+                <input
+                  type="text"
+                  value={eventForm.time}
+                  onChange={(e) => setEventForm({ ...eventForm, time: e.target.value })}
+                  className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green"
+                />
+              </div>
 
-              <input
-                type="text"
-                value={eventForm.location}
-                onChange={(e) => setEventForm({ ...eventForm, location: e.target.value })}
-                className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Lieu
+                </label>
+                <input
+                  type="text"
+                  value={eventForm.location}
+                  onChange={(e) => setEventForm({ ...eventForm, location: e.target.value })}
+                  className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green"
+                />
+              </div>
 
-              <input
-                type="url"
-                value={eventForm.location_link}
-                onChange={(e) => setEventForm({ ...eventForm, location_link: e.target.value })}
-                className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Lien Google Maps (optionnel)
+                </label>
+                <input
+                  type="url"
+                  value={eventForm.location_link}
+                  onChange={(e) => setEventForm({ ...eventForm, location_link: e.target.value })}
+                  className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green"
+                />
+              </div>
 
               {/* Upload d'affiche */}
               <div className="md:col-span-2">
@@ -510,20 +535,30 @@ export default function AdminEventsPage() {
                 )}
               </div>
 
-              <input
-                type="url"
-                value={eventForm.registration_link}
-                onChange={(e) => setEventForm({ ...eventForm, registration_link: e.target.value })}
-                className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Lien d&apos;inscription (optionnel)
+                </label>
+                <input
+                  type="url"
+                  value={eventForm.registration_link}
+                  onChange={(e) => setEventForm({ ...eventForm, registration_link: e.target.value })}
+                  className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green"
+                />
+              </div>
             </div>
 
-            <textarea
-              value={eventForm.description}
-              onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
-              className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green resize-none mb-6"
-              rows={4}
-            />
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Description de l&apos;événement
+              </label>
+              <textarea
+                value={eventForm.description}
+                onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
+                className="w-full bg-brand-dark border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-green resize-none mb-6"
+                rows={4}
+              />
+            </div>
 
             <div className="flex gap-3">
               <Button

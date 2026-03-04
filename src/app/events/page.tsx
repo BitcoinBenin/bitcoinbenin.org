@@ -7,6 +7,7 @@ import { FaCalendarAlt, FaMapMarkerAlt, FaArrowRight } from 'react-icons/fa';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AnimatedCounter } from '@/app/components/Animations';
+import LumaCalendar from '@/app/components/LumaCalendar';
 
 interface Event {
   id: string;
@@ -309,6 +310,13 @@ export default function EventsPage() {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Section Calendrier Luma */}
+      <section className="py-16 bg-brand-dark/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <LumaCalendar />
         </div>
       </section>
 
