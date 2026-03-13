@@ -250,6 +250,23 @@ export default function BitcoinSchoolAdmin() {
                       style={{ width: `${stat.participants > 0 ? ((stat.attendance_d1 + stat.attendance_d2 + stat.attendance_d3) / (stat.participants * 3)) * 100 : 0}%` }}
                     />
                   </div>
+                  
+                  {/* Détail par jour */}
+                  <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-tighter text-gray-500 pt-1">
+                    <div className="flex flex-col items-center">
+                      <span>Jour 1</span>
+                      <span className="text-white text-xs">{stat.attendance_d1}</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <span>Jour 2</span>
+                      <span className="text-white text-xs">{stat.attendance_d2}</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <span>Jour 3</span>
+                      <span className="text-white text-xs">{stat.attendance_d3}</span>
+                    </div>
+                  </div>
+
                   <div className="flex justify-between text-sm pt-2 border-t border-white/5">
                     <span className="text-gray-400">Score Moyen</span>
                     <span className="text-brand-accent font-bold">

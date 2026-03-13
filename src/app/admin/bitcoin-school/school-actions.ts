@@ -319,16 +319,36 @@ export async function getSchoolStatsByCity() {
       }
       
       statsByCity[city].participants++;
-      if (p.attendance && Array.isArray(p.attendance)) {
-          const attendance = p.attendance[0] as Attendance;
+      
+      let attendance: Attendance | undefined;
+      
+      if (p.attendance) {
+        if (Array.isArray(p.attendance)) {
+          attendance = p.attendance[0] as Attendance;
+        } else {
+          attendance = p.attendance as Attendance;
+        }
+      }
+
+      if (attendance) {
           if (attendance.day_1) statsByCity[city].attendance_d1++;
           if (attendance.day_2) statsByCity[city].attendance_d2++;
           if (attendance.day_3) statsByCity[city].attendance_d3++;
-        }
+      }
     });
 
     results?.forEach(r => {
-      const city = (r.participant as { city?: string })?.city || 'Inconnue';
+      let participant: { city?: string } | undefined;
+      
+      if (r.participant) {
+        if (Array.isArray(r.participant)) {
+          participant = r.participant[0] as { city?: string };
+        } else {
+          participant = r.participant as { city?: string };
+        }
+      }
+
+      const city = participant?.city || 'Inconnue';
       if (statsByCity[city]) {
         statsByCity[city].total_exam_score += r.score;
         statsByCity[city].exam_count++;
