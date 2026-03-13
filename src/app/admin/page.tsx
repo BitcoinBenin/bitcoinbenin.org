@@ -1,372 +1,152 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase, clearSupabaseSession } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import Button from '@/app/components/ui/Button';
-import { FaImages, FaCalendarAlt, FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaSignOutAlt } from 'react-icons/fa';
-import { createEvent, updateEvent as updateEventAction, deleteEvent as deleteEventAction } from './event-actions';
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  location: string;
-  location_link?: string;
-  image?: string;
-  registration_link?: string;
-  created_at: string;
-  updated_at: string;
-}
+import Card from '@/app/components/ui/Card';
+import { 
+  FaImages, 
+  FaCalendarAlt, 
+  FaSchool, 
+  FaChartBar,
+  FaArrowRight
+} from 'react-icons/fa';
+import Link from 'next/link';
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<'gallery' | 'events'>('gallery');
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showEventForm, setShowEventForm] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
-  const [eventForm, setEventForm] = useState({
-    title: '',
-    description: '',
-    date: '',
-    time: '',
-    location: '',
-    location_link: '',
-    image: '',
-    registration_link: ''
+  const [stats, setStats] = useState({
+    events: 0,
+    gallery: 0,
+    school: 0
   });
-  const [posterFile, setPosterFile] = useState<File | null>(null);
-  const [uploadingPoster, setUploadingPoster] = useState(false);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const init = async () => {
       if (!supabase) {
-        setLoading(false);
         router.replace('/login');
         return;
       }
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        setLoading(false);
-        router.replace('/login');
+        router.replace('/login?redirectTo=/admin');
         return;
       }
 
-      fetchEvents();
+      fetchStats();
     };
 
     init();
   }, [router]);
 
-  const handleLogout = async () => {
-    try {
-      await clearSupabaseSession();
-    } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
-    } finally {
-      router.replace('/login');
-    }
-  };
-
-  const fetchEvents = async () => {
-    console.log('fetchEvents appelé, supabase:', !!supabase);
-    
+  const fetchStats = async () => {
+    setLoading(true);
     if (!supabase) {
-      console.log('Supabase non configuré, arrêt');
       setLoading(false);
       return;
     }
-
     try {
-      console.log('Tentative de chargement des événements...');
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .order('date', { ascending: true });
+      const [eventsCount, galleryCount, schoolCount] = await Promise.all([
+        supabase.from('events').select('*', { count: 'exact', head: true }),
+        supabase.from('gallery_images').select('*', { count: 'exact', head: true }),
+        supabase.from('school_participants').select('*', { count: 'exact', head: true })
+      ]);
 
-      if (error) {
-        console.error('Erreur lors du chargement des événements:', error);
-        console.error('Détails erreur:', error.message, error.code, error.details);
-      } else {
-        console.log('Événements chargés:', data?.length || 0);
-        setEvents(data || []);
-      }
+      setStats({
+        events: eventsCount.count || 0,
+        gallery: galleryCount.count || 0,
+        school: schoolCount.count || 0
+      });
     } catch (error) {
-      console.error('Erreur catch:', error);
+      console.error('Erreur stats:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const addEvent = async () => {
-    if (!eventForm.title || !eventForm.date || !eventForm.location) {
-      alert('Veuillez remplir les champs obligatoires');
-      return;
+  const dashboardCards = [
+    {
+      title: 'Gallery Photos',
+      description: 'Gérez les albums et les photos de la communauté.',
+      icon: FaImages,
+      count: stats.gallery,
+      href: '/admin/gallery',
+      color: 'from-brand-green to-emerald-500'
+    },
+    {
+      title: 'Événements',
+      description: 'Créez et modifiez les événements à venir.',
+      icon: FaCalendarAlt,
+      count: stats.events,
+      href: '/admin/events',
+      color: 'from-blue-500 to-brand-electric'
+    },
+    {
+      title: 'Bitcoin School',
+      description: 'Gestion des participants, présences et examens.',
+      icon: FaSchool,
+      count: stats.school,
+      href: '/admin/bitcoin-school',
+      color: 'from-brand-green to-brand-accent'
     }
-
-    console.log('📝 Formulaire brut:', eventForm);
-    
-    // Nettoyage et validation des données
-    const cleanTitle = String(eventForm.title).trim();
-    const cleanDescription = String(eventForm.description).trim();
-    const cleanDate = String(eventForm.date).trim();
-    const cleanTime = String(eventForm.time).trim();
-    const cleanLocation = String(eventForm.location).trim();
-    const cleanLocationLink = eventForm.location_link ? String(eventForm.location_link).trim() : undefined;
-    const cleanImage = eventForm.image ? String(eventForm.image).trim() : undefined;
-    const cleanRegistrationLink = eventForm.registration_link ? String(eventForm.registration_link).trim() : undefined;
-
-    console.log('📝 Données nettoyées:', {
-      cleanTitle,
-      cleanDate,
-      cleanLocation,
-      originalDate: eventForm.date,
-      dateType: typeof eventForm.date
-    });
-
-    // Validation finale après nettoyage
-    if (cleanTitle === '') {
-      alert('Le titre ne peut pas être vide');
-      return;
-    }
-    if (cleanDate === '') {
-      alert('La date ne peut pas être vide');
-      return;
-    }
-    if (cleanLocation === '') {
-      alert('Le lieu ne peut pas être vide');
-      return;
-    }
-
-    console.log('📝 Envoi formulaire nettoyé:', {
-      title: cleanTitle,
-      date: cleanDate,
-      location: cleanLocation
-    });
-
-    try {
-      setUploadingPoster(true);
-      
-      const result = await createEvent(
-        cleanTitle,
-        cleanDescription,
-        cleanDate,
-        cleanTime,
-        cleanLocation,
-        cleanLocationLink,
-        cleanImage,
-        cleanRegistrationLink,
-        posterFile || undefined
-      );
-      
-      if (result.success) {
-        setEvents([result.data, ...events]);
-        resetEventForm();
-      }
-    } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de la création de l\'événement');
-    } finally {
-      setUploadingPoster(false);
-    }
-  };
-
-  const updateEventLocal = async () => {
-    if (!editingEvent) return;
-
-    try {
-      setUploadingPoster(true);
-      
-      const result = await updateEventAction(
-        editingEvent.id,
-        String(eventForm.title),
-        String(eventForm.description),
-        String(eventForm.date),
-        String(eventForm.time),
-        String(eventForm.location),
-        eventForm.location_link ? String(eventForm.location_link) : undefined,
-        eventForm.image ? String(eventForm.image) : undefined,
-        eventForm.registration_link ? String(eventForm.registration_link) : undefined,
-        posterFile || undefined
-      );
-      
-      if (result.success) {
-        setEvents(events.map(e => e.id === editingEvent.id ? result.data : e));
-        resetEventForm();
-      }
-    } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de la mise à jour de l\'événement');
-    } finally {
-      setUploadingPoster(false);
-    }
-  };
-
-  const deleteEvent = async (eventId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) return;
-
-    try {
-      const result = await deleteEventAction(eventId);
-      
-      if (result.success) {
-        setEvents(events.filter(e => e.id !== eventId));
-      }
-    } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de la suppression de l\'événement');
-    }
-  };
-
-  const resetEventForm = () => {
-    setEventForm({
-      title: '',
-      description: '',
-      date: '',
-      time: '',
-      location: '',
-      location_link: '',
-      image: '',
-      registration_link: ''
-    });
-    setPosterFile(null);
-    setEditingEvent(null);
-    setShowEventForm(false);
-  };
-
-  const startEditEvent = (event: Event) => {
-    setEditingEvent(event);
-    setEventForm({
-      title: event.title,
-      description: event.description,
-      date: event.date,
-      time: event.time,
-      location: event.location,
-      location_link: event.location_link || '',
-      image: event.image || '',
-      registration_link: event.registration_link || ''
-    });
-    setShowEventForm(true);
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-white">Chargement...</div>
-      </div>
-    );
-  }
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-display font-bold text-white mb-4">Configuration requise</h2>
-          <p className="text-gray-400">Veuillez configurer Supabase pour accéder à l&apos;administration.</p>
-        </div>
-      </div>
-    );
-  }
+  ];
 
   return (
-    <div className="min-h-screen bg-brand-dark">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-12">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-display font-black text-white mb-4">
-              Administration
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-green to-brand-accent ml-2">
-                Bitcoin Bénin
-              </span>
-            </h1>
-            <p className="text-xl text-gray-400">
-              Gérez la gallery et les événements de la communauté.
-            </p>
-          </div>
-          
-          <Button
-            variant="ghost"
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-gray-400 hover:text-red-400"
-          >
-            <FaSignOutAlt />
-            Déconnexion
-          </Button>
-        </div>
+    <div className="p-8 md:p-12">
+      {/* Welcome Header */}
+      <div className="mb-12 animate-fade-in">
+        <h1 className="text-4xl md:text-5xl font-display font-black text-white mb-4">
+          Bonjour, 
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-green to-brand-accent ml-3">
+            Administrateur
+          </span>
+        </h1>
+        <p className="text-xl text-gray-400">
+          Voici un aperçu de l&apos;activité de Bitcoin Bénin.
+        </p>
+      </div>
 
-        {/* Navigation par onglets */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-brand-charcoal/50 border border-white/5 rounded-full p-1 flex">
-            <button
-              onClick={() => setActiveTab('gallery')}
-              className={`px-6 py-3 rounded-full font-medium transition-all ${
-                activeTab === 'gallery'
-                  ? 'bg-brand-green text-white'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <FaImages className="mr-2" />
-              Gallery
-            </button>
-            <button
-              onClick={() => setActiveTab('events')}
-              className={`px-6 py-3 rounded-full font-medium transition-all ${
-                activeTab === 'events'
-                  ? 'bg-brand-green text-white'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <FaCalendarAlt className="mr-2" />
-              Événements
-            </button>
-          </div>
-        </div>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        {dashboardCards.map((card, index) => (
+          <Link href={card.href} key={index} className="group">
+            <Card className="relative p-8 h-full bg-brand-charcoal hover:bg-white/5 border border-white/5 hover:border-brand-green/30 transition-all duration-500">
+              <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${card.color} p-4 text-white text-3xl mb-8 group-hover:scale-110 transition-transform`}>
+                <card.icon />
+              </div>
+              
+              <div className="mb-6">
+                <div className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">
+                  {card.title}
+                </div>
+                <div className="text-4xl font-display font-black text-white">
+                  {loading ? '...' : card.count}
+                </div>
+              </div>
 
-        {/* Contenu dynamique */}
-        {activeTab === 'gallery' && (
-          <div>
-            <div className="bg-brand-charcoal/50 border border-white/5 rounded-xl p-6 text-center">
-              <h2 className="text-2xl font-display font-bold text-white mb-4">Gestion de la Gallery</h2>
-              <p className="text-gray-400 mb-6">
-                Accédez à l&apos;interface complète de gestion des albums et photos.
+              <p className="text-gray-400 leading-relaxed mb-8">
+                {card.description}
               </p>
-              <Button
-                variant="primary"
-                onClick={() => router.push('/admin/gallery')}
-                className="inline-flex items-center gap-2"
-              >
-                <FaImages />
-                Gérer la Gallery
-              </Button>
-            </div>
-          </div>
-        )}
 
-        {activeTab === 'events' && (
-          <div>
-            <div className="bg-brand-charcoal/50 border border-white/5 rounded-xl p-6 text-center">
-              <h2 className="text-2xl font-display font-bold text-white mb-4">Gestion des événements</h2>
-              <p className="text-gray-400 mb-6">
-                Accédez à l&apos;interface complète de gestion des événements.
-              </p>
-              <Button
-                variant="primary"
-                onClick={() => router.push('/admin/events')}
-                className="inline-flex items-center gap-2"
-              >
-                <FaCalendarAlt />
-                Gérer les événements
-              </Button>
-            </div>
-          </div>
-        )}
+              <div className="flex items-center gap-2 text-brand-green font-bold group-hover:translate-x-2 transition-transform">
+                Gérer <FaArrowRight />
+              </div>
+            </Card>
+          </Link>
+        ))}
+      </div>
+
+      {/* Recent Activity or Placeholder */}
+      <div className="bg-brand-charcoal/30 border border-white/5 rounded-3xl p-12 text-center">
+        <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center text-3xl text-gray-500 mx-auto mb-6">
+          <FaChartBar />
+        </div>
+        <h2 className="text-2xl font-display font-bold text-white mb-4">Statistiques Détaillées</h2>
+        <p className="text-gray-400 max-w-xl mx-auto">
+          Les graphiques d&apos;engagement et les rapports détaillés seront bientôt disponibles ici pour vous aider à mieux suivre l&apos;évolution de la communauté.
+        </p>
       </div>
     </div>
   );
