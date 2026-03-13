@@ -73,7 +73,7 @@ export default function AuthWrapper({ children, redirectTo = '/login' }: AuthWra
       <div className="min-h-screen bg-brand-dark flex items-center justify-center">
         <div className="text-white text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green mx-auto mb-4"></div>
-          <p>Vérification de l'authentification...</p>
+          <p>Vérification de l&apos;authentification...</p>
         </div>
       </div>
     );

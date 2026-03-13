@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
 import Card from '@/app/components/ui/Card';
 import AuthWrapper from '@/app/components/AuthWrapper';
 import { 
   FaImages, 
   FaCalendarAlt, 
   FaSchool, 
-  FaChartBar,
   FaArrowRight
 } from 'react-icons/fa';
 import Link from 'next/link';
