@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Card from '@/app/components/ui/Card';
+import AuthWrapper from '@/app/components/AuthWrapper';
 import { 
   FaImages, 
   FaCalendarAlt, 
@@ -20,26 +21,6 @@ export default function AdminDashboard() {
     school: 0
   });
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
-
-  useEffect(() => {
-    const init = async () => {
-      if (!supabase) {
-        router.replace('/login');
-        return;
-      }
-
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.replace('/login?redirectTo=/admin');
-        return;
-      }
-
-      fetchStats();
-    };
-
-    init();
-  }, [router]);
 
   const fetchStats = async () => {
     setLoading(true);
@@ -60,94 +41,107 @@ export default function AdminDashboard() {
         school: schoolCount.count || 0
       });
     } catch (error) {
-      console.error('Erreur stats:', error);
+      console.error('Erreur lors du chargement des statistiques:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const dashboardCards = [
-    {
-      title: 'Gallery Photos',
-      description: 'Gérez les albums et les photos de la communauté.',
-      icon: FaImages,
-      count: stats.gallery,
-      href: '/admin/gallery',
-      color: 'from-brand-green to-emerald-500'
-    },
-    {
-      title: 'Événements',
-      description: 'Créez et modifiez les événements à venir.',
-      icon: FaCalendarAlt,
-      count: stats.events,
-      href: '/admin/events',
-      color: 'from-blue-500 to-brand-electric'
-    },
-    {
-      title: 'Bitcoin School',
-      description: 'Gestion des participants, présences et examens.',
-      icon: FaSchool,
-      count: stats.school,
-      href: '/admin/bitcoin-school',
-      color: 'from-brand-green to-brand-accent'
-    }
-  ];
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
   return (
-    <div className="p-8 md:p-12">
-      {/* Welcome Header */}
-      <div className="mb-12 animate-fade-in">
-        <h1 className="text-4xl md:text-5xl font-display font-black text-white mb-4">
-          Bonjour, 
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-green to-brand-accent ml-3">
-            Administrateur
-          </span>
-        </h1>
-        <p className="text-xl text-gray-400">
-          Voici un aperçu de l&apos;activité de Bitcoin Bénin.
-        </p>
-      </div>
+    <AuthWrapper>
+      <div className="p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-display font-black text-white mb-4">
+              Tableau de Bord
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-green to-brand-accent ml-3">
+                Admin
+              </span>
+            </h1>
+            <p className="text-gray-400">Gérez votre site Bitcoin Bénin</p>
+          </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        {dashboardCards.map((card, index) => (
-          <Link href={card.href} key={index} className="group">
-            <Card className="relative p-8 h-full bg-brand-charcoal hover:bg-white/5 border border-white/5 hover:border-brand-green/30 transition-all duration-500">
-              <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${card.color} p-4 text-white text-3xl mb-8 group-hover:scale-110 transition-transform`}>
-                <card.icon />
-              </div>
-              
-              <div className="mb-6">
-                <div className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">
-                  {card.title}
+          {/* Stats Cards */}
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <Card className="bg-brand-charcoal/50 border border-white/10 p-6 hover:border-brand-green/30 transition-all">
+                <div className="flex items-center justify-between mb-4">
+                  <FaCalendarAlt className="text-3xl text-brand-green" />
+                  <span className="text-3xl font-black text-white">{stats.events}</span>
                 </div>
-                <div className="text-4xl font-display font-black text-white">
-                  {loading ? '...' : card.count}
+                <h3 className="text-lg font-bold text-white mb-2">Événements</h3>
+                <p className="text-gray-400 text-sm">Événements publiés</p>
+                <Link href="/admin/events" className="inline-flex items-center gap-2 text-brand-green hover:text-brand-accent mt-4 transition-colors">
+                  Gérer <FaArrowRight className="text-sm" />
+                </Link>
+              </Card>
+
+              <Card className="bg-brand-charcoal/50 border border-white/10 p-6 hover:border-brand-green/30 transition-all">
+                <div className="flex items-center justify-between mb-4">
+                  <FaImages className="text-3xl text-brand-green" />
+                  <span className="text-3xl font-black text-white">{stats.gallery}</span>
                 </div>
-              </div>
+                <h3 className="text-lg font-bold text-white mb-2">Galerie</h3>
+                <p className="text-gray-400 text-sm">Images uploadées</p>
+                <Link href="/admin/gallery" className="inline-flex items-center gap-2 text-brand-green hover:text-brand-accent mt-4 transition-colors">
+                  Gérer <FaArrowRight className="text-sm" />
+                </Link>
+              </Card>
 
-              <p className="text-gray-400 leading-relaxed mb-8">
-                {card.description}
-              </p>
+              <Card className="bg-brand-charcoal/50 border border-white/10 p-6 hover:border-brand-green/30 transition-all">
+                <div className="flex items-center justify-between mb-4">
+                  <FaSchool className="text-3xl text-brand-green" />
+                  <span className="text-3xl font-black text-white">{stats.school}</span>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">Bitcoin School</h3>
+                <p className="text-gray-400 text-sm">Participants inscrits</p>
+                <Link href="/admin/bitcoin-school" className="inline-flex items-center gap-2 text-brand-green hover:text-brand-accent mt-4 transition-colors">
+                  Gérer <FaArrowRight className="text-sm" />
+                </Link>
+              </Card>
+            </div>
+          )}
 
-              <div className="flex items-center gap-2 text-brand-green font-bold group-hover:translate-x-2 transition-transform">
-                Gérer <FaArrowRight />
-              </div>
-            </Card>
-          </Link>
-        ))}
-      </div>
+          {/* Quick Actions */}
+          <Card className="bg-brand-charcoal/50 border border-white/10 p-8">
+            <h2 className="text-2xl font-bold text-white mb-6">Actions Rapides</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Link href="/admin/events" className="block">
+                <Card className="bg-brand-dark/50 border border-white/5 p-4 hover:border-brand-green/30 transition-all cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <FaCalendarAlt className="text-2xl text-brand-green" />
+                    <div>
+                      <h3 className="font-bold text-white">Créer un événement</h3>
+                      <p className="text-gray-400 text-sm">Ajouter un nouvel événement</p>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
 
-      {/* Recent Activity or Placeholder */}
-      <div className="bg-brand-charcoal/30 border border-white/5 rounded-3xl p-12 text-center">
-        <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center text-3xl text-gray-500 mx-auto mb-6">
-          <FaChartBar />
+              <Link href="/admin/gallery" className="block">
+                <Card className="bg-brand-dark/50 border border-white/5 p-4 hover:border-brand-green/30 transition-all cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <FaImages className="text-2xl text-brand-green" />
+                    <div>
+                      <h3 className="font-bold text-white">Ajouter des photos</h3>
+                      <p className="text-gray-400 text-sm">Uploader de nouvelles images</p>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            </div>
+          </Card>
         </div>
-        <h2 className="text-2xl font-display font-bold text-white mb-4">Statistiques Détaillées</h2>
-        <p className="text-gray-400 max-w-xl mx-auto">
-          Les graphiques d&apos;engagement et les rapports détaillés seront bientôt disponibles ici pour vous aider à mieux suivre l&apos;évolution de la communauté.
-        </p>
       </div>
-    </div>
+    </AuthWrapper>
   );
 }
