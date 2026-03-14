@@ -16,36 +16,53 @@ export async function validateParticipantForExam(email: string) {
   if (!supabase) return { success: false, error: 'Supabase non configuré' };
 
   try {
-    const { data: participant, error } = await supabase
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1. Récupérer le participant
+    const { data: participant, error: pError } = await supabase
       .from('school_participants')
-      .select('*, attendance:school_attendance(*)')
-      .eq('email', email)
+      .select('id, full_name')
+      .ilike('email', cleanEmail)
       .single();
 
-    if (error || !participant) {
-      return { success: false, error: 'Email non trouvé dans la liste des participants.' };
+    if (pError || !participant) {
+      return { success: false, error: 'Email non trouvé. Assurez-vous d\'utiliser l\'adresse mail fournie lors de votre inscription.' };
     }
 
-    // Optionnel: Vérifier si déjà passé
+    // 2. Vérifier si l'examen a déjà été passé
     const { data: result } = await supabase
       .from('school_exam_results')
-      .select('id')
+      .select('*')
       .eq('participant_id', participant.id)
-      .single();
+      .maybeSingle();
 
     if (result) {
-      return { success: false, error: 'Vous avez déjà passé cet examen.' };
+      return { 
+        success: true, 
+        alreadyFinished: true, 
+        participantId: participant.id,
+        existingResult: result 
+      };
     }
 
-    // Optionnel: Vérifier la présence (par exemple au moins 2 jours sur 3)
-    const att = participant.attendance?.[0];
-    const presenceCount = [att?.day_1, att?.day_2, att?.day_3].filter(Boolean).length;
-    
-    if (presenceCount < 2) {
-      return { success: false, error: 'Votre taux de présence est insuffisant pour passer l\'examen (min 2/3 jours).' };
+    // 3. Récupérer la présence
+    const { data: att, error: aError } = await supabase
+      .from('school_attendance')
+      .select('day_1, day_2, day_3')
+      .eq('participant_id', participant.id)
+      .maybeSingle();
+
+    if (aError || !att) {
+      return { success: false, error: 'Données de présence non trouvées. Veuillez contacter un organisateur.' };
     }
 
-    return { success: true, participantId: participant.id };
+    // 4. Validation des conditions de présence
+    // Seule la présence au Jour 3 est obligatoire
+    if (!att.day_3) {
+      return { success: false, error: 'La présence au Jour 3 (aujourd\'hui) est obligatoire pour passer l\'examen.' };
+    }
+
+    return { success: true, alreadyFinished: false, participantId: participant.id };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return { success: false, error: errorMessage };
@@ -79,7 +96,7 @@ export async function getExamQuestions() {
 /**
  * Enregistrer le résultat de l'examen
  */
-export async function submitExamResult(participantId: string, questionsCorrect: number, durationSeconds: number) {
+export async function submitExamResult(participantId: string, questionsCorrect: number, durationSeconds: number, answers: Record<number, number>) {
   if (!supabase) return { success: false, error: 'Supabase non configuré' };
 
   try {
@@ -97,7 +114,7 @@ export async function submitExamResult(participantId: string, questionsCorrect: 
       if (attendance.day_3) attendancePoints += 6;
     }
 
-    // 2. Calculer le score final (QCM: 4 points par question correcte)
+    // 2. Calculer le score final
     const examPoints = questionsCorrect * 4;
     const totalScore = attendancePoints + examPoints;
 
@@ -108,11 +125,12 @@ export async function submitExamResult(participantId: string, questionsCorrect: 
         score: totalScore,
         total_questions: 21,
         completed_at: new Date().toISOString(),
-        duration_seconds: durationSeconds
+        duration_seconds: durationSeconds,
+        answers: answers
       }]);
 
     if (error) throw error;
-    return { success: true, totalScore };
+    return { success: true, totalScore, attendancePoints, examPoints };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return { success: false, error: errorMessage };
