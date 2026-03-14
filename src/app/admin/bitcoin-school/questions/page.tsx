@@ -15,7 +15,7 @@ export default function BitcoinSchoolQuestions() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Partial<Question>>({
     question_text: '',
-    options: ['', '', '', ''],
+    options: ['', '', ''],
     correct_option_index: 0,
     points: 1
   });
@@ -56,7 +56,7 @@ export default function BitcoinSchoolQuestions() {
       setEditingId(null);
       setForm({
         question_text: '',
-        options: ['', '', '', ''],
+        options: ['', '', ''],
         correct_option_index: 0,
         points: 1
       });
@@ -104,7 +104,7 @@ export default function BitcoinSchoolQuestions() {
             onClick={() => {
               setShowForm(!showForm);
               setEditingId(null);
-              setForm({ question_text: '', options: ['', '', '', ''], correct_option_index: 0, points: 1 });
+              setForm({ question_text: '', options: ['', '', ''], correct_option_index: 0, points: 1 });
             }} 
             variant="primary" 
             className="flex items-center gap-2"
