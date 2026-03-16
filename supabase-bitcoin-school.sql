@@ -61,3 +61,22 @@ CREATE POLICY "Admin full access results" ON school_exam_results USING (auth.rol
 -- Trigger pour la mise à jour automatique des participants
 CREATE TRIGGER update_school_participants_updated_at BEFORE UPDATE ON school_participants
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- 5. Table pour les codes de présence éphémères
+CREATE TABLE IF NOT EXISTS school_attendance_codes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  city TEXT NOT NULL,
+  day_number INTEGER NOT NULL,
+  session_year INTEGER NOT NULL,
+  code TEXT NOT NULL,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(city, day_number, session_year)
+);
+
+-- Activation RLS
+ALTER TABLE school_attendance_codes ENABLE ROW LEVEL SECURITY;
+
+-- Politiques RLS pour les codes (Lecture publique, Admin pour le reste)
+CREATE POLICY "Lecture publique des codes" ON school_attendance_codes FOR SELECT USING (true);
+CREATE POLICY "Admin full access codes" ON school_attendance_codes USING (auth.role() = 'authenticated');

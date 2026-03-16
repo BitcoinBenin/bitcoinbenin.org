@@ -148,11 +148,11 @@ export default function EventModal({ isOpen, onClose, onDontShowAgain, featuredE
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto">
           {/* Confetti Animation */}
           <AnimatePresence>
             {showConfetti && (
-              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div className="fixed inset-0 pointer-events-none overflow-hidden z-[60]">
                 {[...Array(50)].map((_, i) => (
                   <motion.div
                     key={i}
@@ -185,308 +185,305 @@ export default function EventModal({ isOpen, onClose, onDontShowAgain, featuredE
           </AnimatePresence>
 
           {/* Animated Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-dark via-brand-green/10 to-brand-charcoal animate-pulse" />
+          <div className="fixed inset-0 bg-gradient-to-br from-brand-dark via-brand-green/10 to-brand-charcoal animate-pulse pointer-events-none" />
           
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/80 backdrop-blur-xl"
+            className="fixed inset-0 bg-black/90 backdrop-blur-xl"
             onClick={onClose}
           />
           
-          {/* Modal Content */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ type: "spring", duration: 0.3 }}
-            className="relative bg-brand-dark/40 backdrop-blur-2xl border border-brand-green/20 rounded-3xl p-6 lg:p-10 max-w-4xl w-full shadow-2xl overflow-hidden"
-          >
-            {/* Glossy overlay effect */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-green/50 to-transparent" />
-
-            {/* Close Button */}
-            <button
-              onClick={onClose}
-              className="absolute top-6 right-6 z-10 p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all duration-300"
+          {/* Modal Container for Centering & Padding */}
+          <div className="flex min-h-full items-center justify-center p-4 md:p-6 lg:p-10">
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", duration: 0.3 }}
+              className="relative bg-brand-dark/40 backdrop-blur-2xl border border-brand-green/20 rounded-3xl p-5 md:p-8 lg:p-10 max-w-4xl w-full shadow-2xl overflow-hidden"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+              {/* Glossy overlay effect */}
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-green/50 to-transparent" />
 
-            {/* Content */}
-            <div className="flex flex-col lg:flex-row gap-10">
-              {/* Left Side - Text Content */}
-              <div className="flex-1 text-center lg:text-left order-2 lg:order-1">
-                {/* Badge */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-2 bg-brand-green/10 border border-brand-green/20 text-brand-green px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-6"
-                >
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-green opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-green"></span>
-                  </span>
-                  Événement en Vedette
-                </motion.div>
+              {/* Close Button */}
+              <button
+                onClick={onClose}
+                className="absolute top-4 right-4 md:top-6 md:right-6 z-20 p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg transition-all duration-300"
+                aria-label="Fermer"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
 
-                {/* Title */}
-                <h3 className="text-3xl lg:text-4xl font-display font-black text-white mb-4 leading-tight">
-                  {featuredEvent?.title || 'Événement Bitcoin Bénin'}
-                </h3>
+              {/* Content */}
+              <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 pt-4 lg:pt-0">
+                {/* Left Side - Text Content */}
+                <div className="flex-1 text-center lg:text-left order-2 lg:order-1">
+                  {/* Badge */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="inline-flex items-center gap-2 bg-brand-green/10 border border-brand-green/20 text-brand-green px-4 py-1.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest mb-4 md:mb-6"
+                  >
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-green opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-green"></span>
+                    </span>
+                    Événement en Vedette
+                  </motion.div>
 
-                {/* Date & Location */}
-                <div className="space-y-3 mb-6">
-                  {featuredEvent && (
-                    <>
-                      <div className="flex items-center justify-center lg:justify-start gap-3 text-brand-green font-medium">
-                        <div className="p-2 rounded-lg bg-brand-green/10">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                        <span className="text-gray-200">
-                          {new Date(featuredEvent.start_date).toLocaleDateString('fr-FR', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                          {featuredEvent.end_date && featuredEvent.end_date !== featuredEvent.start_date && (
-                            <> - {new Date(featuredEvent.end_date).toLocaleDateString('fr-FR', {
+                  {/* Title */}
+                  <h3 className="text-2xl md:text-3xl lg:text-4xl font-display font-black text-white mb-3 md:mb-4 leading-tight">
+                    {featuredEvent?.title || 'Événement Bitcoin Bénin'}
+                  </h3>
+
+                  {/* Date & Location */}
+                  <div className="space-y-2 md:space-y-3 mb-4 md:mb-6">
+                    {featuredEvent && (
+                      <>
+                        <div className="flex items-center justify-center lg:justify-start gap-3 text-brand-green font-medium">
+                          <div className="p-1.5 md:p-2 rounded-lg bg-brand-green/10">
+                            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <span className="text-gray-200 text-sm md:text-base">
+                            {new Date(featuredEvent.start_date).toLocaleDateString('fr-FR', {
                               day: 'numeric',
                               month: 'long',
-                              year: 'numeric'
-                            })}</>
-                          )}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-center lg:justify-start gap-3 text-brand-green font-medium">
-                        <div className="p-2 rounded-lg bg-brand-green/10">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          </svg>
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
                         </div>
-                        <span className="text-gray-300 italic">{featuredEvent.location}</span>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Description */}
-                <p className="text-gray-400 text-lg leading-relaxed mb-8 line-clamp-3">
-                  {featuredEvent?.description || 'Rejoignez-nous pour cet événement exceptionnel et découvrez le futur de la finance.'}
-                </p>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col gap-4">
-                  <motion.button
-                    whileHover={{ scale: 1.02, translateY: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => featuredEvent?.registration_url && window.open(featuredEvent.registration_url, '_blank')}
-                    className="w-full bg-gradient-to-r from-brand-green to-brand-green-dark text-brand-dark font-black py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(83,203,96,0.3)] hover:shadow-[0_0_30px_rgba(83,203,96,0.5)] transition-all duration-300 text-lg uppercase tracking-wider"
-                  >
-                     S&apos;inscrire Gratuitement
-                  </motion.button>
-
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => window.open('/events', '_self')}
-                      className="flex-1 bg-white/5 border border-white/10 text-white py-3 px-4 rounded-xl hover:bg-white/10 transition-all text-sm font-semibold"
-                    >
-                       Tous les événements
-                    </button>
-                    
-                    <button
-                      onClick={onDontShowAgain}
-                      className="flex-1 text-gray-500 py-3 px-4 rounded-xl hover:text-gray-300 transition-colors text-xs font-medium"
-                    >
-                       Ne plus afficher
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Side - Media & Timer */}
-              <div className="flex-1 lg:max-w-md order-1 lg:order-2 space-y-6">
-                {/* Countdown */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-                  className="bg-brand-dark/60 backdrop-blur-xl rounded-3xl p-6 border border-white/5 shadow-glass relative overflow-hidden group"
-                >
-                  {/* Glowing background effect */}
-                  <div className="absolute -top-20 -right-20 w-40 h-40 bg-brand-green/10 blur-[50px] rounded-full group-hover:bg-brand-green/20 transition-all duration-700" />
-                  
-                  <p className="text-gray-400 font-bold text-xs text-center mb-6 tracking-[0.2em] uppercase">
-                    {countdown.isPast ? (
-                      <span className="text-brand-green animate-pulse">
-                        ÉVÉNEMENT EN COURS
-                      </span>
-                    ) : (
-                      'Début dans'
+                        <div className="flex items-center justify-center lg:justify-start gap-3 text-brand-green font-medium">
+                          <div className="p-1.5 md:p-2 rounded-lg bg-brand-green/10">
+                            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            </svg>
+                          </div>
+                          <span className="text-gray-300 italic text-sm md:text-base">{featuredEvent.location}</span>
+                        </div>
+                      </>
                     )}
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-gray-400 text-base md:text-lg leading-relaxed mb-6 md:mb-8 line-clamp-3 md:line-clamp-none">
+                    {featuredEvent?.description || 'Rejoignez-nous pour cet événement exceptionnel et découvrez le futur de la finance.'}
                   </p>
-                  
-                  {!countdown.isPast ? (
-                    <div className="flex items-center justify-between gap-2">
-                      {/* Days */}
-                      <div className="flex-1 flex flex-col items-center">
-                        <div className="relative w-full h-16 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden">
-                          <AnimatePresence mode="wait">
-                            <motion.span
-                              key={countdown.days}
-                              initial={{ y: 20, opacity: 0 }}
-                              animate={{ y: 0, opacity: 1 }}
-                              exit={{ y: -20, opacity: 0 }}
-                              className="text-2xl lg:text-3xl font-black text-white tabular-nums"
-                            >
-                              {String(countdown.days).padStart(2, '0')}
-                            </motion.span>
-                          </AnimatePresence>
-                        </div>
-                        <span className="text-[10px] text-gray-500 font-bold mt-2 uppercase tracking-tighter">Jours</span>
-                      </div>
 
-                      <span className="text-brand-green/40 font-black mb-6 text-xl">:</span>
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-3 md:gap-4">
+                    <motion.button
+                      whileHover={{ scale: 1.02, translateY: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => featuredEvent?.registration_url && window.open(featuredEvent.registration_url, '_blank')}
+                      className="w-full bg-gradient-to-r from-brand-green to-brand-green-dark text-brand-dark font-black py-3 md:py-4 px-6 md:px-8 rounded-xl shadow-[0_0_20px_rgba(83,203,96,0.3)] hover:shadow-[0_0_30px_rgba(83,203,96,0.5)] transition-all duration-300 text-base md:text-lg uppercase tracking-wider"
+                    >
+                       S&apos;inscrire Gratuitement
+                    </motion.button>
 
-                      {/* Hours */}
-                      <div className="flex-1 flex flex-col items-center">
-                        <div className="relative w-full h-16 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden">
-                          <AnimatePresence mode="wait">
-                            <motion.span
-                              key={countdown.hours}
-                              initial={{ y: 20, opacity: 0 }}
-                              animate={{ y: 0, opacity: 1 }}
-                              exit={{ y: -20, opacity: 0 }}
-                              className="text-2xl lg:text-3xl font-black text-white tabular-nums"
-                            >
-                              {String(countdown.hours).padStart(2, '0')}
-                            </motion.span>
-                          </AnimatePresence>
-                        </div>
-                        <span className="text-[10px] text-gray-500 font-bold mt-2 uppercase tracking-tighter">Heures</span>
-                      </div>
-
-                      <span className="text-brand-green/40 font-black mb-6 text-xl">:</span>
-
-                      {/* Minutes */}
-                      <div className="flex-1 flex flex-col items-center">
-                        <div className="relative w-full h-16 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden">
-                          <AnimatePresence mode="wait">
-                            <motion.span
-                              key={countdown.minutes}
-                              initial={{ y: 20, opacity: 0 }}
-                              animate={{ y: 0, opacity: 1 }}
-                              exit={{ y: -20, opacity: 0 }}
-                              className="text-2xl lg:text-3xl font-black text-white tabular-nums"
-                            >
-                              {String(countdown.minutes).padStart(2, '0')}
-                            </motion.span>
-                          </AnimatePresence>
-                        </div>
-                        <span className="text-[10px] text-gray-500 font-bold mt-2 uppercase tracking-tighter">Min</span>
-                      </div>
-
-                      <span className="text-brand-green/40 font-black mb-6 text-xl">:</span>
-
-                      {/* Seconds */}
-                      <div className="flex-1 flex flex-col items-center">
-                        <div className={`relative w-full h-16 rounded-xl border flex items-center justify-center overflow-hidden transition-all duration-300 ${
-                          countdown.days === 0 && countdown.hours === 0 && countdown.minutes === 0 && countdown.seconds <= 10
-                            ? 'bg-brand-green/20 border-brand-green/50 shadow-[0_0_15px_rgba(83,203,96,0.2)]'
-                            : 'bg-brand-green/5 border-brand-green/20'
-                        }`}>
-                          <AnimatePresence mode="wait">
-                            <motion.span
-                              key={countdown.seconds}
-                              initial={{ y: 20, opacity: 0 }}
-                              animate={{ y: 0, opacity: 1 }}
-                              exit={{ y: -20, opacity: 0 }}
-                              className={`text-2xl lg:text-3xl font-black tabular-nums ${
-                                countdown.days === 0 && countdown.hours === 0 && countdown.minutes === 0 && countdown.seconds <= 10
-                                  ? 'text-white'
-                                  : 'text-brand-green'
-                              }`}
-                            >
-                              {String(countdown.seconds).padStart(2, '0')}
-                            </motion.span>
-                          </AnimatePresence>
-                        </div>
-                        <span className="text-[10px] text-brand-green font-bold mt-2 uppercase tracking-tighter">Sec</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-2">
-                      <motion.div
-                        initial={{ scale: 0.9 }}
-                        animate={{ scale: 1 }}
-                        transition={{ repeat: Infinity, duration: 2, repeatType: "reverse" }}
-                        className="space-y-3"
-                      >
-                        <div className="text-3xl lg:text-4xl font-display font-black text-brand-green drop-shadow-[0_0_10px_rgba(83,203,96,0.5)]">
-                          C&apos;EST PARTI !
-                        </div>
-                        <div className="text-sm font-medium text-gray-400">
-                          Depuis {countdown.hours}h {countdown.minutes}m {countdown.seconds}s
-                        </div>
-                      </motion.div>
-                    </div>
-                  )}
-                </motion.div>
-
-                {/* Image Preview */}
-                <div className="relative group rounded-3xl overflow-hidden border border-white/5 shadow-2xl aspect-[4/3] lg:aspect-auto lg:h-56">
-                  {featuredEvent?.image ? (
-                    <Image
-                      src={featuredEvent.image}
-                      alt={`Preview for ${featuredEvent.title}`}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      onError={(e) => {
-                        e.currentTarget.src = '/bs1.webp';
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full relative overflow-hidden bg-brand-dark/50 flex items-center justify-center">
-                      <Image
-                        src="/bs1.webp"
-                        alt="Bitcoin Benin Communauté"
-                        fill
-                        className="object-contain transition-transform duration-700 group-hover:scale-105"
-                      />
-                    </div>
-                  )}
-                  
-                  {/* Video Overlay */}
-                  {featuredEvent?.video_url && (
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
                       <button
-                        onClick={() => featuredEvent.video_url && window.open(featuredEvent.video_url, '_blank')}
-                        className="bg-brand-green text-brand-dark rounded-full p-5 hover:scale-110 transition-transform shadow-glow"
+                        onClick={() => window.open('/events', '_self')}
+                        className="flex-1 bg-white/5 border border-white/10 text-white py-2.5 md:py-3 px-4 rounded-xl hover:bg-white/10 transition-all text-sm font-semibold"
                       >
-                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z"/>
-                        </svg>
+                         Tous les événements
+                      </button>
+                      
+                      <button
+                        onClick={onDontShowAgain}
+                        className="flex-1 text-gray-500 py-2.5 md:py-3 px-4 rounded-xl hover:text-gray-300 transition-colors text-xs font-medium"
+                      >
+                         Ne plus afficher
                       </button>
                     </div>
-                  )}
+                  </div>
+                </div>
 
-                  {/* Top-right decorative badge */}
-                  <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold text-white uppercase tracking-widest">
-                    Direct
+                {/* Right Side - Media & Timer */}
+                <div className="flex-1 lg:max-w-md order-1 lg:order-2 space-y-4 md:space-y-6">
+                  {/* Countdown */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                    className="bg-brand-dark/60 backdrop-blur-xl rounded-2xl md:rounded-3xl p-4 md:p-6 border border-white/5 shadow-glass relative overflow-hidden group"
+                  >
+                    {/* Glowing background effect */}
+                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-brand-green/10 blur-[50px] rounded-full group-hover:bg-brand-green/20 transition-all duration-700" />
+                    
+                    <p className="text-gray-400 font-bold text-[10px] md:text-xs text-center mb-4 md:mb-6 tracking-[0.2em] uppercase">
+                      {countdown.isPast ? (
+                        <span className="text-brand-green animate-pulse">
+                          ÉVÉNEMENT EN COURS
+                        </span>
+                      ) : (
+                        'Début dans'
+                      )}
+                    </p>
+                    
+                    {!countdown.isPast ? (
+                      <div className="flex items-center justify-between gap-1 md:gap-2">
+                        {/* Days */}
+                        <div className="flex-1 flex flex-col items-center">
+                          <div className="relative w-full h-12 md:h-16 bg-white/5 rounded-lg md:rounded-xl border border-white/10 flex items-center justify-center overflow-hidden">
+                            <AnimatePresence mode="wait">
+                              <motion.span
+                                key={countdown.days}
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -20, opacity: 0 }}
+                                className="text-xl md:text-2xl lg:text-3xl font-black text-white tabular-nums"
+                              >
+                                {String(countdown.days).padStart(2, '0')}
+                              </motion.span>
+                            </AnimatePresence>
+                          </div>
+                          <span className="text-[8px] md:text-[10px] text-gray-500 font-bold mt-1 md:mt-2 uppercase tracking-tighter">Jours</span>
+                        </div>
+
+                        <span className="text-brand-green/40 font-black mb-4 md:mb-6 text-base md:text-xl">:</span>
+
+                        {/* Hours */}
+                        <div className="flex-1 flex flex-col items-center">
+                          <div className="relative w-full h-12 md:h-16 bg-white/5 rounded-lg md:rounded-xl border border-white/10 flex items-center justify-center overflow-hidden">
+                            <AnimatePresence mode="wait">
+                              <motion.span
+                                key={countdown.hours}
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -20, opacity: 0 }}
+                                className="text-xl md:text-2xl lg:text-3xl font-black text-white tabular-nums"
+                              >
+                                {String(countdown.hours).padStart(2, '0')}
+                              </motion.span>
+                            </AnimatePresence>
+                          </div>
+                          <span className="text-[8px] md:text-[10px] text-gray-500 font-bold mt-1 md:mt-2 uppercase tracking-tighter">Heures</span>
+                        </div>
+
+                        <span className="text-brand-green/40 font-black mb-4 md:mb-6 text-base md:text-xl">:</span>
+
+                        {/* Minutes */}
+                        <div className="flex-1 flex flex-col items-center">
+                          <div className="relative w-full h-12 md:h-16 bg-white/5 rounded-lg md:rounded-xl border border-white/10 flex items-center justify-center overflow-hidden">
+                            <AnimatePresence mode="wait">
+                              <motion.span
+                                key={countdown.minutes}
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -20, opacity: 0 }}
+                                className="text-xl md:text-2xl lg:text-3xl font-black text-white tabular-nums"
+                              >
+                                {String(countdown.minutes).padStart(2, '0')}
+                              </motion.span>
+                            </AnimatePresence>
+                          </div>
+                          <span className="text-[8px] md:text-[10px] text-gray-500 font-bold mt-1 md:mt-2 uppercase tracking-tighter">Min</span>
+                        </div>
+
+                        <span className="text-brand-green/40 font-black mb-4 md:mb-6 text-base md:text-xl">:</span>
+
+                        {/* Seconds */}
+                        <div className="flex-1 flex flex-col items-center">
+                          <div className={`relative w-full h-12 md:h-16 rounded-lg md:rounded-xl border flex items-center justify-center overflow-hidden transition-all duration-300 ${
+                            countdown.days === 0 && countdown.hours === 0 && countdown.minutes === 0 && countdown.seconds <= 10
+                              ? 'bg-brand-green/20 border-brand-green/50 shadow-[0_0_15px_rgba(83,203,96,0.2)]'
+                              : 'bg-brand-green/5 border-brand-green/20'
+                          }`}>
+                            <AnimatePresence mode="wait">
+                              <motion.span
+                                key={countdown.seconds}
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -20, opacity: 0 }}
+                                className={`text-xl md:text-2xl lg:text-3xl font-black tabular-nums ${
+                                  countdown.days === 0 && countdown.hours === 0 && countdown.minutes === 0 && countdown.seconds <= 10
+                                    ? 'text-white'
+                                    : 'text-brand-green'
+                                }`}
+                              >
+                                {String(countdown.seconds).padStart(2, '0')}
+                              </motion.span>
+                            </AnimatePresence>
+                          </div>
+                          <span className="text-[8px] md:text-[10px] text-brand-green font-bold mt-1 md:mt-2 uppercase tracking-tighter">Sec</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-2">
+                        <motion.div
+                          initial={{ scale: 0.9 }}
+                          animate={{ scale: 1 }}
+                          transition={{ repeat: Infinity, duration: 2, repeatType: "reverse" }}
+                          className="space-y-2 md:space-y-3"
+                        >
+                          <div className="text-2xl md:text-3xl lg:text-4xl font-display font-black text-brand-green drop-shadow-[0_0_10px_rgba(83,203,96,0.5)]">
+                            C&apos;EST PARTI !
+                          </div>
+                          <div className="text-xs md:text-sm font-medium text-gray-400">
+                            Depuis {countdown.hours}h {countdown.minutes}m {countdown.seconds}s
+                          </div>
+                        </motion.div>
+                      </div>
+                    )}
+                  </motion.div>
+
+                  {/* Image Preview */}
+                  <div className="relative group rounded-2xl md:rounded-3xl overflow-hidden border border-white/5 shadow-2xl aspect-[16/9] lg:aspect-auto lg:h-56">
+                    {featuredEvent?.image ? (
+                      <Image
+                        src={featuredEvent.image}
+                        alt={`Preview for ${featuredEvent.title}`}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        onError={(e) => {
+                          e.currentTarget.src = '/bs1.webp';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full relative overflow-hidden bg-brand-dark/50 flex items-center justify-center">
+                        <Image
+                          src="/bs1.webp"
+                          alt="Bitcoin Benin Communauté"
+                          fill
+                          className="object-contain transition-transform duration-700 group-hover:scale-105"
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Video Overlay */}
+                    {featuredEvent?.video_url && (
+                      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <button
+                          onClick={() => featuredEvent.video_url && window.open(featuredEvent.video_url, '_blank')}
+                          className="bg-brand-green text-brand-dark rounded-full p-4 md:p-5 hover:scale-110 transition-transform shadow-glow"
+                        >
+                          <svg className="w-6 h-6 md:w-8 md:h-8" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Top-right decorative badge */}
+                    <div className="absolute top-3 right-3 md:top-4 md:right-4 bg-black/60 backdrop-blur-md border border-white/10 px-2 md:px-3 py-1 rounded-full text-[8px] md:text-[10px] font-bold text-white uppercase tracking-widest">
+                      Direct
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
       )}
     </AnimatePresence>

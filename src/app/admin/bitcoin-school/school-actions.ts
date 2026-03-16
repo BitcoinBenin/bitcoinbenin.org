@@ -10,8 +10,9 @@ export interface Participant {
   email: string;
   phone: string;
   city: string;
+  session_year: number;
   created_at: string;
-  attendance?: Attendance;
+  attendance?: Attendance | Attendance[];
 }
 
 // Interface pour les présences
@@ -20,6 +21,34 @@ export interface Attendance {
   day_1: boolean;
   day_2: boolean;
   day_3: boolean;
+}
+
+/**
+ * Récupérer les années disponibles dans la base de données
+ */
+export async function getAvailableYears() {
+  if (!supabase) return { success: false, error: 'Supabase non configuré' };
+
+  try {
+    const { data, error } = await supabase
+      .from('school_participants')
+      .select('session_year')
+      .order('session_year', { ascending: false });
+
+    if (error) throw error;
+    
+    const uniqueYears = Array.from(new Set(data?.map(d => d.session_year) || []));
+    
+    // Si aucune année n'existe encore, on propose l'année en cours
+    if (uniqueYears.length === 0) {
+      return { success: true, data: [new Date().getFullYear()] };
+    }
+    
+    return { success: true, data: uniqueYears };
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return { success: false, error: errorMessage };
+  }
 }
 
 /**
@@ -37,14 +66,24 @@ export async function calculateAttendancePoints(attendance?: Attendance) {
 /**
  * Récupérer tous les participants avec leurs présences
  */
-export async function getParticipants() {
+export async function getParticipants(year?: number, city?: string) {
   if (!supabase) return { success: false, error: 'Supabase non configuré' };
 
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('school_participants')
       .select('*, attendance:school_attendance(*)')
       .order('created_at', { ascending: false });
+
+    if (year) {
+      query = query.eq('session_year', year);
+    }
+    
+    if (city && city !== 'Toutes') {
+      query = query.eq('city', city);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
     return { success: true, data };
@@ -57,14 +96,14 @@ export async function getParticipants() {
 /**
  * Ajouter un nouveau participant
  */
-export async function addParticipant(name: string, email: string, phone: string, city: string) {
+export async function addParticipant(name: string, email: string, phone: string, city: string, year: number) {
   if (!supabase) return { success: false, error: 'Supabase non configuré' };
 
   try {
     // 1. Ajouter le participant
     const { data: participant, error: pError } = await supabase
       .from('school_participants')
-      .insert([{ full_name: name, email, phone, city }])
+      .insert([{ full_name: name, email, phone, city, session_year: year }])
       .select()
       .single();
 
@@ -209,7 +248,7 @@ export async function deleteQuestion(id: string) {
 /**
  * Importer plusieurs participants d'un coup (depuis Luma CSV par exemple)
  */
-export async function bulkAddParticipants(participants: { name: string, email: string, phone?: string, city: string }[]) {
+export async function bulkAddParticipants(participants: { name: string, email: string, phone?: string, city: string, session_year: number }[]) {
   if (!supabase) return { success: false, error: 'Supabase non configuré' };
 
   try {
@@ -217,9 +256,10 @@ export async function bulkAddParticipants(participants: { name: string, email: s
     
     for (const p of participants) {
       // 1. Insérer le participant (ou ignorer si l'email existe déjà)
+      // Note: l'email devrait être unique par année idéalement, mais ici on garde l'email unique global par simplicité SQL
       const { data: participant, error: pError } = await supabase
         .from('school_participants')
-        .upsert([{ full_name: p.name, email: p.email, phone: p.phone, city: p.city }], { onConflict: 'email' })
+        .upsert([{ full_name: p.name, email: p.email, phone: p.phone, city: p.city, session_year: p.session_year }], { onConflict: 'email' })
         .select()
         .single();
 
@@ -250,17 +290,21 @@ export async function bulkAddParticipants(participants: { name: string, email: s
 }
 
 /**
- * Vider complètement la table des participants
+ * Vider complètement la table des participants pour une année donnée
  */
-export async function clearAllParticipants() {
+export async function clearAllParticipants(year?: number) {
   if (!supabase) return { success: false, error: 'Supabase non configuré' };
 
   try {
-    // La suppression en cascade s'occupera des présences et résultats
-    const { error } = await supabase
-      .from('school_participants')
-      .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000'); // Supprime tout
+    let query = supabase.from('school_participants').delete();
+    
+    if (year) {
+      query = query.eq('session_year', year);
+    } else {
+      query = query.neq('id', '00000000-0000-0000-0000-000000000000'); // Supprime tout
+    }
+
+    const { error } = await query;
 
     if (error) throw error;
     
@@ -273,25 +317,41 @@ export async function clearAllParticipants() {
 }
 
 /**
- * Récupérer les statistiques globales par ville
+ * Récupérer les statistiques globales par ville pour une année donnée
  */
-export async function getSchoolStatsByCity() {
+export async function getSchoolStatsByCity(year?: number) {
   if (!supabase) return { success: false, error: 'Supabase non configuré' };
 
   try {
-    // 1. Récupérer tous les participants avec leurs présences
-    const { data: participants, error: pError } = await supabase
+    // 1. Récupérer tous les participants avec leurs présences filtrés par année
+    let pQuery = supabase
       .from('school_participants')
-      .select('city, attendance:school_attendance(day_1, day_2, day_3)');
+      .select('city, session_year, attendance:school_attendance(day_1, day_2, day_3)');
+    
+    if (year) {
+      pQuery = pQuery.eq('session_year', year);
+    }
+
+    const { data: participants, error: pError } = await pQuery;
 
     if (pError) throw pError;
 
-    // 2. Récupérer tous les résultats d'examen avec la ville du participant
-    const { data: results, error: rError } = await supabase
+    // 2. Récupérer tous les résultats d'examen avec la ville du participant filtrés par année
+    const rQuery = supabase
       .from('school_exam_results')
-      .select('score, participant:school_participants(city)');
+      .select('score, participant:school_participants(city, session_year)');
+    
+    const { data: results, error: rError } = await rQuery;
 
     if (rError) throw rError;
+
+    // Filtrer les résultats par année si spécifié
+    const filteredResults = year 
+      ? results?.filter(r => {
+          const p = Array.isArray(r.participant) ? r.participant[0] : r.participant;
+          return (p as { session_year: number })?.session_year === year;
+        })
+      : results;
 
     // 3. Aggréger les données par ville
     const statsByCity: Record<string, {
@@ -337,7 +397,7 @@ export async function getSchoolStatsByCity() {
       }
     });
 
-    results?.forEach(r => {
+    filteredResults?.forEach(r => {
       let participant: { city?: string } | undefined;
       
       if (r.participant) {
