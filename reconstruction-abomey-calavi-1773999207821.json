@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-03-20T09:33:27.821Z",
+  "city": "Abomey-Calavi",
+  "session_year": 2025,
+  "instructions": "\n📋 INSTRUCTIONS POUR RECONSTRUCTION MANUELLE:\n\n1. 🔍 CHERCHER LES DONNÉES:\n   - Vérifiez votre email aujourd'hui\n   - Vérifiez WhatsApp/Telegram\n   - Demandez aux autres admins\n   - Regardez dans Downloads/Documents\n\n2. 📝 FORMAT POUR RÉIMPORTATION:\n   Créez un fichier CSV avec ce format exact:\n   nom,email,téléphone,ville\n   \n   Exemple:\n   \"Jean Dupont\",\"jean.dupont@email.com\",\"22912345678\",\"Abomey-Calavi\"\n   \"Marie Adegnon\",\"marie.a@email.com\",\"22987654321\",\"Abomey-Calavi\"\n\n3. 🚀 IMPORTATION:\n   - Allez dans Admin → Bitcoin School → 2025 → Abomey-Calavi\n   - Cliquez \"Importer un fichier CSV\"\n   - Sélectionnez votre fichier\n   - Vérifiez que tout s'importe correctement\n\n4. ✅ PRÉSENCE ET EXAMEN:\n   Une fois importés, vous devrez:\n   - Cocher manuellement les présences (si vous les connaissez)\n   - Noter manuellement les résultats (si vous les avez)\n\n🎯 QUESTIONS À VOUS POSER:\n   - Avez-vous les noms des participants?\n   - Avez-vous leurs emails?\n   - Avez-vous leurs numéros?\n   - Qui a ajouté ces participants?\n   - Quand ont-ils été ajoutés?\n   \n💡 ASTUCE: Même une liste partielle est mieux que rien!\n",
+  "template": [
+    {
+      "nom": "Nom du participant",
+      "email": "email@exemple.com",
+      "telephone": "229XXXXXXXX",
+      "ville": "Abomey-Calavi"
+    }
+  ]
+}

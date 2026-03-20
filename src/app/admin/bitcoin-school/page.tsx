@@ -110,22 +110,41 @@ export default function BitcoinSchoolAdmin() {
 
   const handleAddParticipant = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedYear || !selectedCity) return;
-
-    const result = await addParticipant(
-      newParticipant.name,
-      newParticipant.email,
-      newParticipant.phone,
-      selectedCity, // Utilise la ville actuellement gérée
-      selectedYear
-    );
-    if (result.success) {
-      setShowAddForm(false);
-      setNewParticipant({ name: '', email: '', phone: '', city: selectedCity });
-      refreshData();
-    } else {
-      alert('Erreur: ' + result.error);
+    if (!selectedYear || !selectedCity) {
+      alert('Veuillez sélectionner une année et une ville');
+      return;
     }
+
+    if (!newParticipant.name || !newParticipant.email) {
+      alert('Le nom et l\'email sont obligatoires');
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const result = await addParticipant(
+        newParticipant.name.trim(),
+        newParticipant.email.trim(),
+        newParticipant.phone.trim(),
+        selectedCity, // Utilise la ville actuellement gérée
+        selectedYear
+      );
+      
+      if (result.success) {
+        setShowAddForm(false);
+        setNewParticipant({ name: '', email: '', phone: '', city: selectedCity });
+        refreshData();
+        alert('Participant ajouté avec succès !');
+      } else {
+        alert('Erreur: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout du participant:', error);
+      alert('Une erreur est survenue. Veuillez réessayer.');
+    }
+    
+    setLoading(false);
   };
 
   const toggleAttendance = async (participantId: string, day: 1 | 2 | 3, currentStatus: boolean) => {
@@ -198,11 +217,20 @@ export default function BitcoinSchoolAdmin() {
   const handleClearCity = async () => {
     if (!selectedCity || !selectedYear) return;
     
-    if (confirm(`ÊTES-VOUS SÛR ? Cette action supprimera TOUS les participants de ${selectedCity} pour la session ${selectedYear}. Cette action est irréversible.`)) {
-      setLoading(true);
+    // CONFIRMATION SIMPLE pour éviter les erreurs
+    const confirmation = confirm(`⚠️  ATTENTION - SUPPRESSION IRRÉVERSIBLE ⚠️\n\nÊtes-vous sûr de vouloir supprimer TOUS les participants de ${selectedCity} ?\n\nCette action supprimera:\n- Les participants de cette ville\n- Leurs données de présence\n- Leurs résultats d'examen\n\nCette action est IRRÉVERSIBLE!`);
+    
+    if (!confirmation) {
+      return;
+    }
+    
+    setLoading(true);
+    
+    // Utiliser server action correctement
+    try {
       const result = await clearCityParticipants(selectedCity, selectedYear);
       if (result.success) {
-        alert(`${result.count} participants de ${selectedCity} ont été supprimés.`);
+        alert(`${result.count} participants de ${selectedCity} ont été supprimés.\n\n⚠️  Cette action est irréversible!`);
         // Recharger les données pour la ville
         if (viewMode === 'management') {
           handleSelectCity(selectedCity);
@@ -212,8 +240,12 @@ export default function BitcoinSchoolAdmin() {
       } else {
         alert('Erreur: ' + result.error);
       }
-      setLoading(false);
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error);
+      alert('Une erreur est survenue. Veuillez réessayer.');
     }
+    
+    setLoading(false);
   };
 
   const handleImportCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -222,18 +254,29 @@ export default function BitcoinSchoolAdmin() {
 
     const reader = new FileReader();
     reader.onload = async (event) => {
-      const text = event.target?.result as string;
-      const lines = text.split('\n');
-      const headers = lines[0].split(/[;,]/).map(h => h.trim().toLowerCase());
-      
-      const emailIdx = headers.findIndex(h => h.includes('email'));
-      const nameIdx = headers.findIndex(h => h.includes('name') || h.includes('nom'));
-      const phoneIdx = headers.findIndex(h => h.includes('phone') || h.includes('téléphone'));
+      try {
+        const text = event.target?.result as string;
+        if (!text) {
+          alert('Erreur de lecture du fichier');
+          return;
+        }
+        
+        const lines = text.split('\n').filter(line => line.trim());
+        if (lines.length < 2) {
+          alert('Le fichier CSV est vide ou invalide');
+          return;
+        }
+        
+        const headers = lines[0].split(/[;,]/).map(h => h.trim().toLowerCase());
+        
+        const emailIdx = headers.findIndex(h => h.includes('email'));
+        const nameIdx = headers.findIndex(h => h.includes('name') || h.includes('nom'));
+        const phoneIdx = headers.findIndex(h => h.includes('phone') || h.includes('téléphone'));
 
-      if (emailIdx === -1 || nameIdx === -1) {
-        alert("Le CSV doit contenir au moins les colonnes 'Name' et 'Email'.");
-        return;
-      }
+        if (emailIdx === -1 || nameIdx === -1) {
+          alert("Le CSV doit contenir au moins les colonnes 'Name' et 'Email'.");
+          return;
+        }
 
       const parsedParticipants = lines.slice(1)
         .filter(line => line.trim())
@@ -258,6 +301,11 @@ export default function BitcoinSchoolAdmin() {
         } else {
           alert('Erreur: ' + result.error);
         }
+        setLoading(false);
+      }
+      } catch (error) {
+        console.error('Erreur lors de l\'import CSV:', error);
+        alert('Une erreur est survenue lors de l\'import du fichier CSV. Veuillez vérifier le format.');
         setLoading(false);
       }
     };
