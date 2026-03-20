@@ -12,21 +12,23 @@ export interface Question {
 /**
  * Vérifier si un participant peut passer l'examen
  */
-export async function validateParticipantForExam(email: string) {
+export async function validateParticipantForExam(email: string, city: string, sessionYear: number) {
   if (!supabase) return { success: false, error: 'Supabase non configuré' };
 
   try {
     const cleanEmail = email.trim().toLowerCase();
 
-    // 1. Récupérer le participant
+    // 1. Récupérer le participant (unique par ville + année)
     const { data: participant, error: pError } = await supabase
       .from('school_participants')
       .select('id, full_name')
       .ilike('email', cleanEmail)
+      .eq('city', city)
+      .eq('session_year', sessionYear)
       .single();
 
     if (pError || !participant) {
-      return { success: false, error: 'Email non trouvé. Assurez-vous d\'utiliser l\'adresse mail fournie lors de votre inscription.' };
+      return { success: false, error: 'Email non trouvé dans cette ville pour cette session. Vérifiez votre ville et votre email.' };
     }
 
     // 2. Vérifier si l'examen a déjà été passé
