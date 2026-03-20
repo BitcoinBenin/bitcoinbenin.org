@@ -1,0 +1,13 @@
+
+> website@0.1.0 dev /home/d/bitcoinbenin.org
+> next dev --port 3001
+
+   ▲ Next.js 15.5.9
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.1.142:3001
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · serverActions
+
+ ✓ Starting...
+ ✓ Ready in 4s

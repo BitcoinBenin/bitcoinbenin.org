@@ -38,12 +38,22 @@ export async function getAvailableYears() {
     if (error) throw error;
     
     const uniqueYears = Array.from(new Set(data?.map(d => d.session_year) || []));
-    
+
+    const currentYear = new Date().getFullYear();
+
     // Si aucune année n'existe encore, on propose l'année en cours
     if (uniqueYears.length === 0) {
-      return { success: true, data: [new Date().getFullYear()] };
+      return { success: true, data: [currentYear] };
     }
-    
+
+    // Ajouter l'année en cours si pas encore présente
+    if (!uniqueYears.includes(currentYear)) {
+      uniqueYears.push(currentYear);
+    }
+
+    // Trier par ordre décroissant
+    uniqueYears.sort((a, b) => b - a);
+
     return { success: true, data: uniqueYears };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -100,26 +110,79 @@ export async function addParticipant(name: string, email: string, phone: string,
   if (!supabase) return { success: false, error: 'Supabase non configuré' };
 
   try {
-    // 1. Ajouter le participant
+    console.log('🔍 Tentative d\'ajout participant:', { name, email, phone, city, year });
+    
+    // 1. Vérifier si le participant existe déjà dans cette ville et cette année
+    const { data: existing, error: checkError } = await supabase
+      .from('school_participants')
+      .select('*')
+      .eq('email', email)
+      .eq('city', city)
+      .eq('session_year', year)
+      .single();
+    
+    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = not found
+      console.error('❌ Erreur vérification existant:', checkError);
+      throw checkError;
+    }
+    
+    // Si le participant existe déjà dans cette ville/année
+    if (existing) {
+      console.log('ℹ️  Participant existe déjà dans cette ville/année');
+      return { 
+        success: false, 
+        error: `${existing.full_name || name} est déjà enregistré à ${city} pour la session ${year}.`,
+        existing: true 
+      };
+    }
+    
+    // 2. Ajouter le participant (même si l'email existe dans une autre ville)
     const { data: participant, error: pError } = await supabase
       .from('school_participants')
       .insert([{ full_name: name, email, phone, city, session_year: year }])
       .select()
       .single();
 
-    if (pError) throw pError;
+    console.log('📊 Résultat insertion participant:', { participant, pError });
+
+    if (pError) {
+      console.error('❌ Erreur insertion participant:', pError);
+      throw pError;
+    }
 
     // 2. Créer son entrée de présence par défaut
+    console.log('📝 Création entrée de présence pour participant ID:', participant.id);
+    
     const { error: aError } = await supabase
       .from('school_attendance')
       .insert([{ participant_id: participant.id, day_1: false, day_2: false, day_3: false }]);
 
-    if (aError) throw aError;
+    console.log('📊 Résultat insertion présence:', { aError });
 
+    if (aError) {
+      console.error('❌ Erreur insertion présence:', aError);
+      throw aError;
+    }
+
+    console.log('✅ Participant ajouté avec succès');
     revalidatePath('/admin/bitcoin-school');
     return { success: true, data: participant };
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('🚨 Erreur complète dans addParticipant:', error);
+    
+    let errorMessage = 'Unknown error';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === 'object' && error !== null) {
+      const errObj = error as { code?: string; details?: string; message?: string };
+      if (errObj.code === '23505' && errObj.details?.includes('email')) {
+        errorMessage = `${name} est déjà enregistré à ${city} pour la session ${year}.`;
+      } else if (typeof errObj.message === 'string') {
+        errorMessage = errObj.message;
+      }
+    }
+    
+    console.error('🔍 Message d\'erreur final:', errorMessage);
     return { success: false, error: errorMessage };
   }
 }

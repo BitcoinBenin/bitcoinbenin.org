@@ -196,24 +196,6 @@ export default function BitcoinSchoolAdmin() {
     }
   };
 
-  const handleClearAll = async () => {
-    if (confirm(`ÊTES-VOUS SÛR ? Cette action supprimera TOUS les participants de la session ${selectedYear}. Cette action est irréversible.`)) {
-      setLoading(true);
-      const result = await clearAllParticipants(selectedYear!);
-      if (result.success) {
-        alert('Toutes les données de la session ont été effacées.');
-        if (viewMode === 'management') {
-          handleSelectYear(selectedYear!);
-        } else {
-          refreshData();
-        }
-      } else {
-        alert('Erreur: ' + result.error);
-      }
-      setLoading(false);
-    }
-  };
-
   const handleClearCity = async () => {
     if (!selectedCity || !selectedYear) return;
     
@@ -444,6 +426,26 @@ export default function BitcoinSchoolAdmin() {
                         <span className="text-brand-green font-bold">
                           {stat.participants > 0 ? Math.round(((stat.attendance_d1 + stat.attendance_d2 + stat.attendance_d3) / (stat.participants * 3)) * 100) : 0}%
                         </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3 text-xs">
+                        <div className="bg-white/5 rounded-lg p-2 text-center border border-white/5">
+                          <div className="text-gray-500 font-black uppercase tracking-widest">Jour 1</div>
+                          <div className="text-white font-black mt-1">
+                            {stat.attendance_d1}/{stat.participants}
+                          </div>
+                        </div>
+                        <div className="bg-white/5 rounded-lg p-2 text-center border border-white/5">
+                          <div className="text-gray-500 font-black uppercase tracking-widest">Jour 2</div>
+                          <div className="text-white font-black mt-1">
+                            {stat.attendance_d2}/{stat.participants}
+                          </div>
+                        </div>
+                        <div className="bg-white/5 rounded-lg p-2 text-center border border-white/5">
+                          <div className="text-gray-500 font-black uppercase tracking-widest">Jour 3</div>
+                          <div className="text-white font-black mt-1">
+                            {stat.attendance_d3}/{stat.participants}
+                          </div>
+                        </div>
                       </div>
                       <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
                         <div 
