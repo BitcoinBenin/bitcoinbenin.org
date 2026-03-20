@@ -425,3 +425,45 @@ export async function getSchoolStatsByCity(year?: number) {
     return { success: false, error: errorMessage };
   }
 }
+
+/**
+ * Vider uniquement les participants d'une ville spécifique pour une année donnée
+ */
+export async function clearCityParticipants(city: string, year: number) {
+  if (!supabase) return { success: false, error: 'Supabase non configuré' };
+
+  try {
+    // 1. Supprimer les participants de cette ville
+    const { error: deleteError } = await supabase
+      .from('school_participants')
+      .delete()
+      .eq('city', city)
+      .eq('session_year', year);
+
+    if (deleteError) throw deleteError;
+
+    // 2. Supprimer les entrées de présence correspondantes
+    const { data: participants } = await supabase
+      .from('school_participants')
+      .select('id')
+      .eq('city', city)
+      .eq('session_year', year);
+
+    if (participants && participants.length > 0) {
+      const participantIds = participants.map(p => p.id);
+      const { error: attendanceError } = await supabase
+        .from('school_attendance')
+        .delete()
+        .in('participant_id', participantIds);
+
+      if (attendanceError) throw attendanceError;
+    }
+
+    revalidatePath('/admin/bitcoin-school');
+    return { success: true, count: participants?.length || 0 };
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Erreur suppression ville:', errorMessage);
+    return { success: false, error: errorMessage };
+  }
+}

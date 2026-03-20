@@ -14,7 +14,7 @@ import {
 import { 
   getParticipants, addParticipant, updateAttendance, deleteParticipant, 
   bulkAddParticipants, getSchoolStatsByCity, clearAllParticipants, 
-  getAvailableYears, Participant, Attendance 
+  getAvailableYears, clearCityParticipants, Participant, Attendance 
 } from './school-actions';
 import AttendanceQRGenerator from './AttendanceQRGenerator';
 
@@ -185,6 +185,27 @@ export default function BitcoinSchoolAdmin() {
         alert('Toutes les données de la session ont été effacées.');
         if (viewMode === 'management') {
           handleSelectYear(selectedYear!);
+        } else {
+          refreshData();
+        }
+      } else {
+        alert('Erreur: ' + result.error);
+      }
+      setLoading(false);
+    }
+  };
+
+  const handleClearCity = async () => {
+    if (!selectedCity || !selectedYear) return;
+    
+    if (confirm(`ÊTES-VOUS SÛR ? Cette action supprimera TOUS les participants de ${selectedCity} pour la session ${selectedYear}. Cette action est irréversible.`)) {
+      setLoading(true);
+      const result = await clearCityParticipants(selectedCity, selectedYear);
+      if (result.success) {
+        alert(`${result.count} participants de ${selectedCity} ont été supprimés.`);
+        // Recharger les données pour la ville
+        if (viewMode === 'management') {
+          handleSelectCity(selectedCity);
         } else {
           refreshData();
         }
@@ -443,7 +464,7 @@ export default function BitcoinSchoolAdmin() {
                   <FaUserPlus /> Ajouter un participant
                 </Button>
                 <Button 
-                  onClick={handleClearAll} 
+                  onClick={handleClearCity} 
                   variant="ghost" 
                   className="flex items-center gap-2 text-red-500 border border-red-500/10 hover:bg-red-500/10 transition-colors"
                 >
