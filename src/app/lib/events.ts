@@ -5,14 +5,10 @@ export async function getAllFeaturedEvents(): Promise<FeaturedEvent[]> {
   if (!supabase) return [];
 
   try {
-    console.log('Récupération TOUS les événements vedettes...');
-    
     const { data, error } = await supabase
       .from('featured_events')
       .select('*')
       .order('created_at', { ascending: false });
-
-    console.log('Tous les événements:', { data, error });
 
     if (error) {
       console.error('Erreur récupération événements vedettes:', error);
@@ -30,8 +26,6 @@ export async function getFeaturedEvent(): Promise<FeaturedEvent | null> {
   if (!supabase) return null;
 
   try {
-    console.log('Récupération événement vedette...');
-    
     const { data, error } = await supabase
       .from('featured_events')
       .select('*')
@@ -40,17 +34,13 @@ export async function getFeaturedEvent(): Promise<FeaturedEvent | null> {
       .limit(1)
       .single();
 
-    console.log('Résultat Supabase:', { data, error });
-
     if (error) {
-      console.error('Erreur récupération événement vedette:', error);
+      // Pas d'événement vedette actif, ce n'est pas une erreur
       return null;
     }
 
-    console.log('Événement vedette trouvé:', data);
     return data;
   } catch (error) {
-    console.error('Erreur:', error);
     return null;
   }
 }

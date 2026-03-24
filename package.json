@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "optimize-images": "node scripts/optimize-images.js"
   },
   "dependencies": {
     "@supabase/storage-js": "^2.91.0",
@@ -21,6 +22,7 @@
     "react-dom": "^18",
     "react-icons": "^5.5.0",
     "recharts": "^3.3.0",
+    "sharp": "^0.34.5",
     "ui": "^0.2.4",
     "website": "link:"
   },

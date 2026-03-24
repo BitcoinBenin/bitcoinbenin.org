@@ -5,7 +5,7 @@ import { supabase, Album, GalleryImage } from '@/lib/supabase';
 import Link from 'next/link';
 import { FaImages, FaCalendarAlt, FaPhotoVideo, FaExpand, FaDownload } from 'react-icons/fa';
 import ImageLightbox from '@/app/components/ImageLightbox';
-import Image from 'next/image';
+import OptimizedImage from '@/app/components/OptimizedImage';
 
 export default function GalleryPage() {
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -53,19 +53,6 @@ export default function GalleryPage() {
       console.error('Erreur:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const getImageUrl = (filePath: string) => {
-    if (!supabase) return '/gallery-placeholder.webp';
-    try {
-      const { data } = supabase.storage
-        .from('gallery')
-        .getPublicUrl(filePath);
-      return data.publicUrl;
-    } catch (error) {
-      console.error('Erreur URL Supabase:', error);
-      return '/gallery-placeholder.webp';
     }
   };
 
@@ -130,27 +117,17 @@ export default function GalleryPage() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {recentImages.map((image) => (
-                <div
-                  key={image.id}
-                  className="group relative aspect-square rounded-lg overflow-hidden bg-brand-charcoal/50 border border-white/5 hover:border-brand-green/30 transition-all duration-300"
-                >
-                  <Image
-                    src={getImageUrl(image.file_path)}
+                <div key={image.id} className="relative aspect-square rounded-lg overflow-hidden bg-brand-charcoal/50 border border-white/5 hover:border-brand-green/30 transition-all duration-300 group">
+                  <OptimizedImage
+                    filePath={image.file_path}
                     alt={image.title}
+                    size="thumb"
                     fill
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
                     onClick={() => setSelectedImage(image)}
-                    onError={(e) => {
-                      console.error('Erreur chargement image:', getImageUrl(image.file_path));
-                      e.currentTarget.src = '/gallery-placeholder.webp';
-                      e.currentTarget.onerror = null;
-                    }}
-                    onLoad={() => {
-                      console.log('Image récente chargée:', getImageUrl(image.file_path));
-                    }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-2">
-                    <div className="flex gap-2">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-2 pointer-events-none">
+                    <div className="flex gap-2 pointer-events-auto">
                       <button
                         onClick={() => setSelectedImage(image)}
                         className="p-2 bg-brand-green/80 rounded-full hover:bg-brand-green transition-colors shadow-lg"
@@ -159,7 +136,7 @@ export default function GalleryPage() {
                         <FaExpand className="text-white text-sm" />
                       </button>
                       <button
-                        onClick={() => handleDownload(getImageUrl(image.file_path), image.title)}
+                        onClick={() => handleDownload(`/api/image?path=${encodeURIComponent(image.file_path)}&width=1920&height=1080&quality=90`, image.title)}
                         className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors shadow-lg"
                         title="Télécharger"
                       >
@@ -200,19 +177,12 @@ export default function GalleryPage() {
                 >
                   <div className="relative aspect-video bg-brand-dark/50">
                     {album.cover_image ? (
-                      <Image
-                        src={getImageUrl(album.cover_image || '')}
+                      <OptimizedImage
+                        filePath={album.cover_image}
                         alt={album.name}
+                        size="medium"
                         fill
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => {
-                          console.error('Erreur chargement image album:', getImageUrl(album.cover_image || ''));
-                          e.currentTarget.src = '/gallery-placeholder.webp';
-                          e.currentTarget.onerror = null;
-                        }}
-                        onLoad={() => {
-                          console.log('Image album chargée:', getImageUrl(album.cover_image || ''));
-                        }}
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full bg-brand-dark/50">
