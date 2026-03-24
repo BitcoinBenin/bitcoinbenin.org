@@ -53,17 +53,20 @@ export default function OptimizedImage({
     params.set('path', filePath);
     
     if (size === 'thumb') {
-      params.set('width', '200');
-      params.set('height', '200');
-      params.set('quality', '60');
+      // Vignettes : qualité moyenne pour chargement rapide
+      params.set('width', '400');
+      params.set('height', '400');
+      params.set('quality', '80');
     } else if (size === 'medium') {
-      params.set('width', '800');
-      params.set('height', '600');
-      params.set('quality', '75');
-    } else {
-      params.set('width', '1600');
-      params.set('height', '1080');
+      // Albums : bonne qualité
+      params.set('width', '1200');
+      params.set('height', '800');
       params.set('quality', '85');
+    } else {
+      // Grande taille : qualité élevée
+      params.set('width', '1920');
+      params.set('height', '1080');
+      params.set('quality', '90');
     }
 
     return `/api/image?${params.toString()}`;

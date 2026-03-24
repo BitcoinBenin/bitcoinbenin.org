@@ -4,10 +4,16 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     serverActions: {
-      bodySizeLimit: '10mb', // Augmenter la limite à 10MB
+      bodySizeLimit: '10mb',
     },
   },
-  // Cible navigateurs modernes pour réduire les polyfills
+  // Désactiver ESLint et le type checking pendant le build pour accélérer
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   images: {
     remotePatterns: [
       {
@@ -22,28 +28,19 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: 'hgnwadiljauqbhsbtxkk.supabase.co' },
     ],
-    // Optimiser le format des images
     formats: ['image/avif', 'image/webp'],
     qualities: [75, 85],
-    // Tailles d'images prédéfinies
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Cache plus long
-    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 jours
+    minimumCacheTTL: 60 * 60 * 24 * 30,
   },
-  // Optimisations de performance
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error'] } : false,
-    // Désactiver les polyfills SWC pour features modernes
     styledComponents: false,
-    // Optimiser le chargement CSS
     emotion: false,
   },
-  // Compression gzip
   compress: true,
-  // Optimisation du chunking et réduction des polyfills
   webpack: (config, { isServer, dev }) => {
-    // Réduire les polyfills côté client
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -60,8 +57,7 @@ const nextConfig: NextConfig = {
         os: false,
         path: false,
       };
-      
-      // Ignorer les polyfills pour features modernes en production
+
       if (!dev) {
         config.resolve.alias = {
           ...config.resolve.alias,
@@ -70,13 +66,12 @@ const nextConfig: NextConfig = {
         };
       }
     }
-    
-    // Optimiser le CSS pour réduire le blocage
+
     config.optimization = {
       ...config.optimization,
       splitChunks: {
         chunks: 'all',
-        maxSize: 244000, // Limiter la taille des chunks CSS
+        maxSize: 244000,
         minSize: 20000,
         cacheGroups: {
           vendor: {

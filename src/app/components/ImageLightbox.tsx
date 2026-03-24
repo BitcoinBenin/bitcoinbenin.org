@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { GalleryImage } from '@/lib/supabase';
-import { supabase } from '@/lib/supabase';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import Image from 'next/image';
 
 interface ImageLightboxProps {
   images: GalleryImage[];
@@ -15,29 +13,64 @@ interface ImageLightboxProps {
 
 export default function ImageLightbox({ images, selectedImage, onClose, initialIndex = 0 }: ImageLightboxProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (selectedImage) {
       const index = images.findIndex(img => img.id === selectedImage.id);
-      setCurrentIndex(index >= 0 ? index : 0);
+      const newIndex = index >= 0 ? index : 0;
+      setCurrentIndex(newIndex);
+      // Ne montrer le loader que si l'image n'est pas préchargée
+      setIsLoading(!loadedImages.has(newIndex));
     }
-  }, [selectedImage, images]);
+  }, [selectedImage, images, loadedImages]);
 
   const getImageUrl = (filePath: string) => {
-    if (!supabase) return '';
-    const { data } = supabase.storage
-      .from('gallery')
-      .getPublicUrl(filePath);
-    return data.publicUrl;
+    if (!filePath) return '';
+    
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (supabaseUrl) {
+      return `${supabaseUrl}/storage/v1/object/public/gallery/${encodeURIComponent(filePath)}`;
+    }
+    return '';
   };
+
+  // Précharger toutes les images au démarrage
+  useEffect(() => {
+    if (images.length === 0) return;
+
+    // Précharger toutes les images en arrière-plan
+    images.forEach((image, index) => {
+      if (!loadedImages.has(index)) {
+        const img = document.createElement('img');
+        img.src = getImageUrl(image.file_path);
+        img.onload = () => {
+          setLoadedImages(prev => new Set(prev).add(index));
+        };
+        img.onerror = () => {
+          // Marquer comme chargé même en cas d'erreur pour éviter les tentatives infinies
+          setLoadedImages(prev => new Set(prev).add(index));
+        };
+      }
+    });
+  }, [images]); // Exécuter une seule fois au démarrage
 
   const navigateImage = (direction: 'prev' | 'next') => {
     if (direction === 'prev') {
       const newIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
       setCurrentIndex(newIndex);
+      // Si l'image est déjà préchargée, ne pas afficher le loader
+      if (loadedImages.has(newIndex)) {
+        setIsLoading(false);
+      }
     } else {
       const newIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
       setCurrentIndex(newIndex);
+      // Si l'image est déjà préchargée, ne pas afficher le loader
+      if (loadedImages.has(newIndex)) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -67,16 +100,20 @@ export default function ImageLightbox({ images, selectedImage, onClose, initialI
       tabIndex={0}
     >
       <div className="relative max-w-7xl max-h-[90vh] w-full">
-        <Image
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-12 h-12 border-4 border-brand-green border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
+        <img
           src={getImageUrl(currentImage.file_path)}
           alt={currentImage.title}
-          width={1200}
-          height={800}
-          className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl mx-auto cursor-pointer"
-          onClick={(e) => {
+          className={`max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl mx-auto cursor-pointer transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
             navigateImage('next');
           }}
+          onLoad={() => setIsLoading(false)}
         />
         
         {/* Flèche gauche */}

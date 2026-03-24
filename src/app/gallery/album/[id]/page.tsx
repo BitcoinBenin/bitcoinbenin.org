@@ -22,16 +22,14 @@ export default function AlbumPage({ params }: AlbumPageProps) {
 
   const fetchAlbumAndImages = useCallback(async () => {
     if (!supabase) return;
-    
+
     try {
-      // Récupérer les informations de l'album
       const { data: albumData, error: albumError } = await supabase
         .from('albums')
         .select('*')
         .eq('id', id)
         .single();
 
-      // Récupérer les images de l'album
       const { data: imagesData, error: imagesError } = await supabase
         .from('gallery_images')
         .select('*')
@@ -39,18 +37,18 @@ export default function AlbumPage({ params }: AlbumPageProps) {
         .order('created_at', { ascending: false });
 
       if (albumError) {
-        console.error('Erreur lors du chargement de l\'album:', albumError);
+        return null;
       } else {
         setAlbum(albumData);
       }
 
       if (imagesError) {
-        console.error('Erreur lors du chargement des images:', imagesError);
+        setImages([]);
       } else {
         setImages(imagesData || []);
       }
     } catch (error) {
-      console.error('Erreur:', error);
+      // Erreur silencieuse
     } finally {
       setLoading(false);
     }

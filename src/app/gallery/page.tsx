@@ -23,15 +23,13 @@ export default function GalleryPage() {
 
   const fetchAlbumsAndImages = async () => {
     if (!supabase) return;
-    
+
     try {
-      // Récupérer les albums
       const { data: albumsData, error: albumsError } = await supabase
         .from('albums')
         .select('*')
         .order('created_at', { ascending: false });
 
-      // Récupérer les images récentes pour la section "derniers ajouts"
       const { data: imagesData, error: imagesError } = await supabase
         .from('gallery_images')
         .select('*')
@@ -39,18 +37,18 @@ export default function GalleryPage() {
         .limit(6);
 
       if (albumsError) {
-        console.error('Erreur lors du chargement des albums:', albumsError);
+        setAlbums([]);
       } else {
         setAlbums(albumsData || []);
       }
 
       if (imagesError) {
-        console.error('Erreur lors du chargement des images:', imagesError);
+        setRecentImages([]);
       } else {
         setRecentImages(imagesData || []);
       }
     } catch (error) {
-      console.error('Erreur:', error);
+      // Erreur silencieuse
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GalleryImage } from '@/lib/supabase';
 import { deleteImage } from '../admin/actions';
 import { FaDownload, FaTrash, FaExpand, FaChevronLeft, FaChevronRight, FaStar, FaImage } from 'react-icons/fa';
@@ -24,6 +24,30 @@ export default function ImageGalleryWithActions({
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
+
+  // Précharger les images adjacentes pour navigation rapide
+  useEffect(() => {
+    if (!selectedImage || images.length === 0) return;
+
+    const indicesToPreload = [
+      (currentIndex - 1 + images.length) % images.length,
+      (currentIndex + 1) % images.length,
+      (currentIndex - 2 + images.length) % images.length,
+      (currentIndex + 2) % images.length,
+    ];
+
+    indicesToPreload.forEach(index => {
+      if (!loadedImages.has(index) && images[index]) {
+        const img = document.createElement('img');
+        // Qualité moyenne pour préchargement rapide
+        img.src = `/api/image?path=${encodeURIComponent(images[index].file_path)}&width=1200&height=800&quality=85`;
+        img.onload = () => {
+          setLoadedImages(prev => new Set(prev).add(index));
+        };
+      }
+    });
+  }, [currentIndex, images, loadedImages, selectedImage]);
 
   const handleDelete = async (imageId: string, filePath: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) return;

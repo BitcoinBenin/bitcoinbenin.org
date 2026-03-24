@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import sharp from 'sharp';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -22,11 +21,11 @@ export async function GET(request: NextRequest) {
   // Valider les paramètres
   const validWidths = [200, 400, 600, 800, 1200, 1600, 1920];
   const validHeights = [200, 400, 600, 800, 1000, 1080];
-  const validQualities = [60, 70, 75, 80, 85, 90];
+  const validQualities = [75, 80, 85, 90, 95];
 
   const safeWidth = validWidths.find(w => w >= width) || validWidths[validWidths.length - 1];
   const safeHeight = validHeights.find(h => h >= height) || validHeights[validHeights.length - 1];
-  const safeQuality = validQualities.find(q => q >= quality) || 75;
+  const safeQuality = validQualities.find(q => q >= quality) || 85;
 
   // Clé de cache unique
   const cacheKey = `${path}-${safeWidth}x${safeHeight}-q${safeQuality}`;
@@ -57,10 +56,13 @@ export async function GET(request: NextRequest) {
     const arrayBuffer = await data.arrayBuffer();
     const originalBuffer = Buffer.from(arrayBuffer);
 
+    // Import dynamique de sharp (évite les problèmes de build)
+    const sharp = (await import('sharp')).default;
+
     // Transformer avec Sharp
     const metadata = await sharp(originalBuffer).metadata();
     const aspectRatio = (metadata.width || 800) / (metadata.height || 600);
-    
+
     let transformedWidth = safeWidth;
     let transformedHeight = Math.round(safeWidth / aspectRatio);
 
