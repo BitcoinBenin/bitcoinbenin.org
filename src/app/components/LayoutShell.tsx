@@ -12,7 +12,9 @@ type Props = {
 export default function LayoutShell({ children }: Props) {
   const pathname = usePathname();
   const isAdminShellRoute =
-    pathname?.startsWith("/admin") || pathname === "/login";
+    pathname?.startsWith("/admin") || 
+    pathname === "/login" || 
+    pathname === "/bitcoin-school/check-in";
 
   if (isAdminShellRoute) {
     return (

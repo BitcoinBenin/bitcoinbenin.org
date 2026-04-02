@@ -1,0 +1,36 @@
+// SCRIPT POUR VÉRIFIER LE CACHE NAVIGATEUR
+console.log('🔍 VÉRIFICATION CACHE NAVIGATEUR POUR DONNÉES ABOMEY-CALAVI');
+console.log('');
+
+console.log('📋 ÉTAPES À SUIVRE DANS LE NAVIGATEUR:');
+console.log('');
+console.log('1. OUVRIR L\'ADMIN BITCOIN SCHOOL:');
+console.log('   - Allez sur /admin/bitcoin-school');
+console.log('   - Ouvrez les outils de développement (F12)');
+console.log('');
+console.log('2. VÉRIFIER CONSOLE:');
+console.log('   - Onglet Console');
+console.log('   - Cherchez des erreurs ou logs récents');
+console.log('   - Peut-être que les noms apparaissent dans les logs');
+console.log('');
+console.log('3. VÉRIFIER LOCAL STORAGE:');
+console.log('   - Onglet Application → Local Storage');
+console.log('   - Cherchez "bitcoin-school" ou "participants"');
+console.log('   - Les données pourraient être stockées localement');
+console.log('');
+console.log('4. VÉRIFIER SESSION STORAGE:');
+console.log('   - Onglet Application → Session Storage');
+console.log('   - Cherchez des données de formulaire');
+console.log('');
+console.log('5. VÉRIFIER RÉSEAU:');
+console.log('   - Onglet Network');
+console.log('   - Filtrez "participants" ou "school"');
+console.log('   - Cherchez les requêtes POST de création');
+console.log('');
+console.log('🎯 CE QU\'IL FAUT CHERCHER:');
+console.log('- Noms des participants Abomey-Calavi');
+console.log('- Emails des participants');
+console.log('- Données de présence (day_1, day_2, day_3)');
+console.log('- Résultats d\'examen');
+console.log('');
+console.log('⚠️  FAITES CELA MAINTENANT - AVANT QUE LE CACHE NE SOIT NETTOYÉ!');

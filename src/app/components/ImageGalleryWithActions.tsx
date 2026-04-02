@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GalleryImage } from '@/lib/supabase';
-import { supabase } from '@/lib/supabase';
 import { deleteImage } from '../admin/actions';
 import { FaDownload, FaTrash, FaExpand, FaChevronLeft, FaChevronRight, FaStar, FaImage } from 'react-icons/fa';
-import Image from 'next/image';
+import OptimizedImage from '@/app/components/OptimizedImage';
 
 interface ImageGalleryProps {
   images: GalleryImage[];
@@ -15,24 +14,40 @@ interface ImageGalleryProps {
   isCoverImage?: (imagePath: string) => boolean;
 }
 
-export default function ImageGalleryWithActions({ 
-  images, 
-  onImageDelete, 
-  editable = false, 
-  onSetAsCover, 
-  isCoverImage 
+export default function ImageGalleryWithActions({
+  images,
+  onImageDelete,
+  editable = false,
+  onSetAsCover,
+  isCoverImage
 }: ImageGalleryProps) {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
 
-  const getImageUrl = (filePath: string) => {
-    if (!supabase) return '';
-    const { data } = supabase.storage
-      .from('gallery')
-      .getPublicUrl(filePath);
-    return data.publicUrl;
-  };
+  // Précharger les images adjacentes pour navigation rapide
+  useEffect(() => {
+    if (!selectedImage || images.length === 0) return;
+
+    const indicesToPreload = [
+      (currentIndex - 1 + images.length) % images.length,
+      (currentIndex + 1) % images.length,
+      (currentIndex - 2 + images.length) % images.length,
+      (currentIndex + 2) % images.length,
+    ];
+
+    indicesToPreload.forEach(index => {
+      if (!loadedImages.has(index) && images[index]) {
+        const img = document.createElement('img');
+        // Qualité moyenne pour préchargement rapide
+        img.src = `/api/image?path=${encodeURIComponent(images[index].file_path)}&width=1200&height=800&quality=85`;
+        img.onload = () => {
+          setLoadedImages(prev => new Set(prev).add(index));
+        };
+      }
+    });
+  }, [currentIndex, images, loadedImages, selectedImage]);
 
   const handleDelete = async (imageId: string, filePath: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) return;
@@ -115,16 +130,13 @@ export default function ImageGalleryWithActions({
             key={image.id}
             className="group relative aspect-square rounded-xl overflow-hidden bg-brand-charcoal/50 border border-white/5 hover:border-brand-green/30 transition-all duration-300"
           >
-            <Image
-              src={getImageUrl(image.file_path)}
+            <OptimizedImage
+              filePath={image.file_path}
               alt={image.title}
+              size="thumb"
               fill
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
               onClick={() => openImage(image)}
-              onError={() => {
-                console.error('Erreur chargement image:', getImageUrl(image.file_path));
-                // Optionnel: ajouter un fallback
-              }}
             />
             
             {/* Overlay au hover */}
@@ -138,7 +150,7 @@ export default function ImageGalleryWithActions({
               </button>
               
               <button
-                onClick={() => handleDownload(getImageUrl(image.file_path), image.title)}
+                onClick={() => handleDownload(`/api/image?path=${encodeURIComponent(image.file_path)}&width=1920&height=1080&quality=90`, image.title)}
                 className="p-3 bg-white/20 rounded-full hover:bg-white/30 transition-colors shadow-lg"
                 title="Télécharger"
               >
@@ -198,14 +210,14 @@ export default function ImageGalleryWithActions({
           tabIndex={0}
         >
           <div className="relative max-w-7xl max-h-[90vh] w-full">
-            <Image
-              src={getImageUrl(selectedImage.file_path)}
+            <OptimizedImage
+              filePath={selectedImage.file_path}
               alt={selectedImage.title}
+              size="full"
               width={1200}
               height={800}
               className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl mx-auto cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={() => {
                 navigateImage('next');
               }}
             />

@@ -15,8 +15,8 @@ try {
   if (supabaseUrl && supabaseAnonKey) {
     supabaseClient = createClient<AnyDatabase>(supabaseUrl, supabaseAnonKey, {
       auth: {
-        persistSession: false,
-        autoRefreshToken: false,
+        persistSession: true,
+        autoRefreshToken: true,
       }
     })
   }

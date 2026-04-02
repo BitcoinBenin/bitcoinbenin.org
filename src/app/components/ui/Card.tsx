@@ -1,15 +1,17 @@
-import { ReactNode } from 'react';
+import { ReactNode, MouseEventHandler } from 'react';
 
 interface CardProps {
     children: ReactNode;
     className?: string;
     variant?: 'default' | 'glass' | 'hover';
+    onClick?: MouseEventHandler<HTMLDivElement>;
 }
 
 export default function Card({
     children,
     className = '',
-    variant = 'default'
+    variant = 'default',
+    onClick
 }: CardProps) {
     const baseStyles = 'rounded-3xl transition-all duration-500 overflow-hidden';
 
@@ -20,7 +22,10 @@ export default function Card({
     };
 
     return (
-        <div className={`${baseStyles} ${variants[variant]} ${className}`}>
+        <div 
+            className={`${baseStyles} ${variants[variant]} ${className} ${onClick ? 'cursor-pointer' : ''}`}
+            onClick={onClick}
+        >
             {children}
         </div>
     );

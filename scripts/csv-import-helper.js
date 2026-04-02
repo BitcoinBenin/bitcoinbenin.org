@@ -1,0 +1,37 @@
+// AIDE POUR IMPORTATION CSV ABOMEY-CALAVI
+console.log('🚀 AIDE IMPORTATION CSV - ABOMEY-CALAVI');
+console.log('');
+
+console.log('📋 FORMAT EXACT REQUIS:');
+console.log('nom,email,téléphone,ville');
+console.log('');
+console.log('📝 EXEMPLES:');
+console.log('"Jean Dupont","jean.dupont@email.com","22912345678","Abomey-Calavi"');
+console.log('"Marie Adegnon","marie.a@email.com","22987654321","Abomey-Calavi"');
+console.log('');
+console.log('⚠️  POINTS IMPORTANTS:');
+console.log('1. Pas d\'accents dans les noms si possible');
+console.log('2. Emails valides requis');
+console.log('3. Téléphones format: 229XXXXXXXX');
+console.log('4. Ville EXACT: "Abomey-Calavi"');
+console.log('5. Pas de ligne vide');
+console.log('');
+console.log('🎯 ÉTAPES D\'IMPORTATION:');
+console.log('1. Créez le fichier CSV avec votre liste');
+console.log('2. Allez dans Admin → Bitcoin School → 2025');
+console.log('3. Cliquez sur "Abomey-Calavi"');
+console.log('4. Cliquez "Importer un fichier CSV"');
+console.log('5. Sélectionnez votre fichier');
+console.log('6. Vérifiez que tout s\'importe bien');
+console.log('');
+console.log('🔧 SI ERREUR D\'IMPORT:');
+console.log('- Vérifiez le format des emails');
+console.log('- Vérifiez qu\'il n\'y a pas de virgules dans les noms');
+console.log('- Assurez-vous que la ville est exactement "Abomey-Calavi"');
+console.log('');
+console.log('✅ APRÈS IMPORTATION:');
+console.log('- Les participants apparaîtront dans la liste');
+console.log('- Vous devrez ajouter manuellement les présences');
+console.log('- Vous devrez ajouter manuellement les résultats d\'examen');
+console.log('');
+console.log('🚀 PRÊT ? Ouvrez votre fichier et commencez !');

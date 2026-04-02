@@ -2,16 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/app/components/ui/Button';
 import { FaLock, FaEnvelope } from 'react-icons/fa';
+import { Suspense } from 'react';
 
-export default function LoginPage() {
+function LoginContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirectTo') || '/admin';
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -22,12 +25,12 @@ export default function LoginPage() {
       } = await supabase.auth.getSession();
 
       if (session) {
-        router.replace('/admin');
+        router.replace(redirectTo);
       }
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, redirectTo]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +44,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -49,9 +52,9 @@ export default function LoginPage() {
       if (error) {
         setError('Email ou mot de passe incorrect');
       } else {
-        router.replace('/admin');
+        router.replace(redirectTo);
       }
-    } catch (error) {
+    } catch {
       setError('Erreur de connexion');
     } finally {
       setLoading(false);
@@ -61,9 +64,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-brand-dark flex items-center justify-center px-4">
       <div className="max-w-md w-full">
-        {/* Formulaire centré sans header */}
         <div className="bg-brand-charcoal/50 border border-white/5 rounded-2xl p-8 backdrop-blur-md">
-          {/* Titre simple */}
           <div className="text-center mb-8">
             <h1 className="text-2xl font-display font-black text-white mb-2">
               Bitcoin Bénin
@@ -137,5 +138,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-brand-dark flex items-center justify-center text-white">Chargement...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

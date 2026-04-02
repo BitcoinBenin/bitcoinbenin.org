@@ -39,7 +39,7 @@ export const PARTNERS = [
 export const NAV_LINKS = [
   { name: ' Communauté', href: '/communaute' },
   { name: ' Evènements', href: '/events' },
-  { name: ' Soutenir', href: '/nous-soutenir' },
+  { name: ' Blog', href: '/blog' },
   { name: ' Ressources', href: '/NosRessources' },
   { name: ' Galerie', href: '/gallery' },
   { name: 'Accepter Bitcoin', href: '/accepter-bitcoin' },
